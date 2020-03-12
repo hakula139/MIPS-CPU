@@ -3,7 +3,7 @@
 // Arithmetic logic unit
 module alu
 (
-  input logic [2:0] aluControl,
+  input logic [3:0] aluControl,
   input logic [31:0] a, b,
   output logic [31:0] aluResult
 );
