@@ -4,17 +4,17 @@
 module regfile
 (
   input logic clk,
-  input logic we3,
-  input logic [4:0] wa3,
-  input logic [31:0] wd3,
-  input logic [4:0] ra1, ra2,
-  output logic [31:0] rd1, rd2
+  input logic regWriteEn,
+  input logic [4:0] regWriteAddr,
+  input logic [31:0] regWriteData,
+  input logic [4:0] rsAddr, rtAddr,
+  output logic [31:0] rsData, rtData
 );
   logic [31:0] rf[31:0];
   always_ff @(posedge clk) begin
-    if (we3) rf[wa3] <= wd3;
+    if (regWriteEn) rf[regWriteAddr] <= regWriteData;
   end
   // Register 0 hardwired to 0
-  assign rd1 = ra1 ? rf[ra1] : '0;
-  assign rd2 = ra2 ? rf[ra2] : '0;
+  assign rsData = rsAddr ? rf[rsAddr] : '0;
+  assign rtData = rtAddr ? rf[rtAddr] : '0;
 endmodule: regfile

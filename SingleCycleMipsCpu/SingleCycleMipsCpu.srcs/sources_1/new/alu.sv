@@ -3,23 +3,23 @@
 // Arithmetic logic unit
 module alu
 (
-  input logic [2:0] alucont,
+  input logic [2:0] aluControl,
   input logic [31:0] a, b,
-  output logic [31:0] result
+  output logic [31:0] aluResult
 );
   always_comb begin
-    unique case(alucont) inside
-      0: result <= a & b;
-      1: result <= a | b;
-      2: result <= a + b;
-      3: result <= b << a;
-      4: result <= a & ~b;
-      5: result <= a | ~b;
-      6: result <= a - b;
-      7: result <= a < b ? 32'b1 : '0;
-      8: result <= b >> a;   // logical shift
-      9: result <= b >>> a;  // arithmetic shift
-      default: result <= '0;
+    unique case(aluControl) inside
+      0: aluResult <= a & b;
+      1: aluResult <= a | b;
+      2: aluResult <= a + b;
+      3: aluResult <= b << a;
+      4: aluResult <= a & ~b;
+      5: aluResult <= a | ~b;
+      6: aluResult <= a - b;
+      7: aluResult <= a < b ? 32'b1 : '0;
+      8: aluResult <= b >> a;   // logical shift
+      9: aluResult <= b >>> a;  // arithmetic shift
+      default: aluResult <= '0;
     endcase
   end
 endmodule: alu
