@@ -21,11 +21,11 @@ module controller
             jump,                // output
             aluOp                // output
           );
-  aludec ad(
-           aluOp,      // input
-           funct,      // input
-           aluControl  // output
-         );
+  aludec  ad(
+            aluOp,      // input
+            funct,      // input
+            aluControl  // output
+          );
   assign pcSrc = branch & zero;
 endmodule: controller
 
