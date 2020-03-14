@@ -5,7 +5,8 @@ module alu
 (
   input logic [3:0] aluControl,
   input logic [31:0] a, b,
-  output logic [31:0] aluResult
+  output logic [31:0] aluResult,
+  output logic zero
 );
   always_comb begin
     unique case(aluControl) inside
@@ -22,4 +23,5 @@ module alu
       default: aluResult <= '0;
     endcase
   end
+  assign zero = !aluResult;
 endmodule: alu
