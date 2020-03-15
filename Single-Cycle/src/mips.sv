@@ -1,5 +1,8 @@
 `timescale 1ns / 1ps
 
+// Since our TA has hard-coded variable names into the grader, we have
+// to name the variables like this, regardless of the coding style.
+
 // Single-cycle 32-bit MIPS processor
 module mips (
   input               clk,
