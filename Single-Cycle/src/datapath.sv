@@ -31,10 +31,10 @@ module datapath (
     .clk_i,
     .rst_i,
     .d_i(pc_next),
-    .q_o(pc)
+    .q_o(pc_o)
   );
   adder     u1_adder (
-    .a_i(pc),
+    .a_i(pc_o),
     .b_i(32'd4),
     .result_o(pc_plus_4)
   );
