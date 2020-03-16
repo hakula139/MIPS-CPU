@@ -12,5 +12,5 @@ module imem (
   initial begin
     $readmemh("memfile.dat", RAM);
   end
-  assign rd = RAM[a];
+  assign rd = RAM[a];  // word aligned
 endmodule : imem

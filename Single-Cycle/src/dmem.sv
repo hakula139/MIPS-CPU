@@ -15,5 +15,5 @@ module dmem (
   always_ff @(posedge clk) begin
     if (we) RAM[a[31:2]] <= wd;
   end
-  assign rd = RAM[a[31:2]];
+  assign rd = RAM[a[31:2]];  // word aligned
 endmodule : dmem
