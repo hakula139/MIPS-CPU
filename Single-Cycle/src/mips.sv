@@ -35,7 +35,7 @@ module mips (
   datapath     u_datapath (
     .clk_i(clk),
     .rst_i(reset),
-    .instr_i(instr),
+    .instr_i(instr[25:0]),
     .mem_to_reg_i(mem_to_reg),
     .pc_src_i(pc_src),
     .jump_i(jump),

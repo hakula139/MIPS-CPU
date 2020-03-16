@@ -20,3 +20,14 @@ module mux2 #(
 );
   assign result_o = select_i ? data1_i : data0_i;
 endmodule : mux2
+
+// Sign extend
+module sign_ext #(
+  parameter InWidth  = 16,
+  parameter OutWidth = 32
+) (
+  input        [InWidth-1:0]  a_i,
+  output logic [OutWidth-1:0] result_o
+);
+  assign result_o = {{(OutWidth - InWidth){a_i[InWidth - 1]}}, a_i};
+endmodule : sign_ext

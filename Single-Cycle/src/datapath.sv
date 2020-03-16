@@ -3,7 +3,7 @@
 module datapath (
   input               clk_i,
   input               rst_i,
-  input        [31:0] instr_i,
+  input        [25:0] instr_i,
   input               mem_to_reg_i,
   input               pc_src_i,
   input               jump_i,
@@ -20,11 +20,9 @@ module datapath (
 
   logic [31:0] pc_next, pc_branch_next, pc_plus_4, pc_branch;
   logic [4:0]  write_reg;
+  logic [31:0] sign_imm;
   logic [31:0] src_a, src_b;
   logic [31:0] result;
-
-  logic signed [31:0] sign_imm;
-  assign sign_imm = signed'{instr_i[15:0]};
 
   // Next PC logic
   flip_flop pc_reg (
@@ -79,6 +77,10 @@ module datapath (
     .data1_i(read_data_i),
     .select_i(mem_to_reg_i),
     .result_o(result)
+  );
+  sign_ext  u_sign_ext (
+    .a_i(instr_i[15:0]),
+    .result_o(sign_imm)
   );
 
   // ALU logic
