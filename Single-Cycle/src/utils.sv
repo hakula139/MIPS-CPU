@@ -13,13 +13,31 @@ endmodule : adder
 module mux2 #(
   parameter Width = 32
 ) (
-  input        [Width-1:0] data0_i,
-  input        [Width-1:0] data1_i,
+  input        [Width-1:0] data0_i, data1_i,
   input                    select_i,
   output logic [Width-1:0] result_o
 );
   assign result_o = select_i ? data1_i : data0_i;
 endmodule : mux2
+
+// 4-to-1 multiplexer
+module mux4 #(
+  parameter Width = 32
+) (
+  input        [Width-1:0] data0_i, data1_i, data2_i, data3_i,
+  input        [1:0]       select_i,
+  output logic [Width-1:0] result_o
+);
+  always_comb begin
+    unique case (select_i)
+      2'b00:   result_o <= data0_i;
+      2'b01:   result_o <= data1_i;
+      2'b10:   result_o <= data2_i;
+      2'b11:   result_o <= data3_i;
+      default: result_o <= '0;
+    endcase
+  end
+endmodule : mux4
 
 // Sign extend
 module sign_ext #(
