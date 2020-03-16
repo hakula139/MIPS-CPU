@@ -15,7 +15,8 @@ module mips (
   output logic [31:0] writedata
 );
 
-  logic mem_to_reg, branch, pc_src, zero, alu_src, reg_dst, reg_write, jump;
+  logic mem_to_reg, pc_src, zero, alu_src, reg_dst, reg_write;
+  logic [2:0] jump;
   logic [3:0] alu_control;
 
   control_unit u_control_unit (
