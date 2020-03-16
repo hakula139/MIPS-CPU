@@ -52,7 +52,7 @@ module main_dec (
   output logic       reg_write_o
 );
 
-  logic [7:0] bundle;
+  logic [9:0] bundle;
   assign {reg_write_o, reg_dst_o, alu_src_o, alu_op_o,
           jump_o, branch_o, mem_write_o, mem_to_reg_o} = bundle;
 
