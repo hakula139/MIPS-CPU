@@ -187,6 +187,29 @@ end
 
 代码见[这里](./src/utils.sv)。
 
+### 2.7 adder
+
+![Adder](./assets/adder.png)
+
+32 位加法器，用于计算 PC 值及跳转地址。
+
+使用时读入 A 和 B，从 Result 输出 A 和 B 相加后的值。
+
+代码见[这里](./src/utils.sv)。
+
+### 2.8 mux2 & mux4
+
+![2:1 Multiplexer](./assets/mux2.png)
+![4:1 Multiplexer](./assets/mux4.png)
+
+多路复用器，用于数据多选一，操作数位数可改变。
+
+使用时读入多路 data，从 Result 输出 Select 选择的那一路的数据。以 mux4 为例，Select 为 `00`, `01`, `10`, `11` 时分别输出 data0, data1, data2, data3 的值。
+
+图中 mux4 只输入了 3 个 data，是因为这里只需要用到 3 个。教材的电路设计中并没有用到 mux4，我引入 mux4 的目的是为了简化 pc_next 和 write_reg 的选择电路。
+
+代码见[这里](./src/utils.sv)。
+
 ## 参考资料
 
 1. David Money Harris, Sarah L. Harris: *Digital Design and Computer Architecture Second Edition*
