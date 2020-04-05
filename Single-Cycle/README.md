@@ -111,9 +111,28 @@ CPU 核心可分为两个部分：control_unit 和 datapath，分别表示控制
 
 控制单元负责解析输入的指令，决定各个控制信号。
 
-实现中，先通过主译码器 main_dec 解码，对其中类型为 R-type 的指令再通过 ALU 译码器 alu_dec 解码。完整真值表如下：
+实现中，先通过主译码器 main_dec 解码，对其中类型为 R-type 的指令再通过 ALU 译码器 alu_dec 解码。
 
-|  指令  | opcode |  funct  | rw | rd | alus | aluop | j   | br | mw | mr |
+代码见[这里](./src/control_unit.sv)。实现中将控制信号集中赋值，省去了书写大量赋值语句的麻烦。
+
+```verilog
+logic [13:0] bundle;
+assign {reg_write_o, reg_dst_o, alu_src_o, alu_op_o,
+        jump_o, branch_o, mem_write_o, mem_to_reg_o} = bundle;
+
+always_comb begin
+  unique case (op_i)
+    6'b001000: bundle <= 14'b10_01000_000_00_00;   // ADDI
+    // ...
+  endcase
+end
+```
+
+#### 2.4.1 main_dec
+
+主译码器。完整真值表如下 [[Ref. 3]](#参考资料)：
+
+| 指令   | opcode | funct   | rw | rd | alus | aluop | j   | br | mw | mr |
 |:------:|:------:|:-------:|:--:|:--:|:----:|:-----:|:---:|:--:|:--:|:--:|
 | add    | 000000 | 100000  | 1  | 1  | 00   | 100   | 000 | 00 | 0  | 0  |
 | sub    | 000000 | 100010  | 1  | 1  | 00   | 100   | 000 | 00 | 0  | 0  |
@@ -146,26 +165,31 @@ CPU 核心可分为两个部分：control_unit 和 datapath，分别表示控制
   - `alu_src[1]` 为 `1` 时，src_a 为 `instr[10:6]`（需 32 位 0 扩展），用于移位操作 sll 等
   - `alu_src[0]` 为 `0` 时，src_b 为寄存器文件 RD2 读出值
   - `alu_src[0]` 为 `1` 时，src_b 为 `instr_i[15:0]`（需 32 位符号扩展），用于需要立即数计算的操作 addi 等
-- aluop 即 alu_op，与指令的映射关系已在表中给出 [[Ref. 3]](#参考资料)，取值的具体含义将在 ALU 模块的章节讲到；当指令为 beq, bne 时需要做减法，故值为 `001`
+- aluop 即 alu_op，与指令的映射关系已在表中给出；当指令为 beq, bne 时需要做减法，故值为 `001`
 - j 即 jump，当指令为 j, jal, jr 时分别为 `001`, `101`, `010`，只是我个人的实现方式，其效果在于届时 datapath 的代码写起来会相对方便
 - br 即 branch，当指令为 beq, bne 时分别为 `01`, `10`
 - mw 即 mem_write，当需要写内存 dmem 时为 `1`，用于指令 sw
 - mr 即 mem_ro_reg，当需要将内存 dmem 读出的值写入寄存器时为 `1`，用于指令 lw
 
-代码见[这里](./src/control_unit.sv)。实现中将控制信号集中赋值，省去了书写大量赋值语句的麻烦。
+#### 2.4.2 alu_dec
 
-```verilog
-logic [13:0] bundle;
-assign {reg_write_o, reg_dst_o, alu_src_o, alu_op_o,
-        jump_o, branch_o, mem_write_o, mem_to_reg_o} = bundle;
+ALU 译码器。完整真值表如下 [[Ref. 3]](#参考资料)：
 
-always_comb begin
-  unique case (op_i)
-    6'b001000: bundle <= 14'b10_01000_000_00_00;   // ADDI
-    // ...
-  endcase
-end
-```
+| 指令         | alu_op | funct   | alu_control |
+|:------------:|:------:|:-------:|:-----------:|
+| add          | 100    | 100000  | 0010        |
+| sub          | 100    | 100010  | 0110        |
+| and          | 100    | 100100  | 0000        |
+| or           | 100    | 100101  | 0001        |
+| slt          | 100    | 101010  | 0111        |
+| sll          | 100    | 000000  | 0011        |
+| srl          | 100    | 000010  | 1000        |
+| sra          | 100    | 000011  | 1001        |
+| addi, lw, sw | 000    | /       | 0010        |
+| beq, bne     | 001    | /       | 0110        |
+| andi         | 010    | /       | 0000        |
+| ori          | 110    | /       | 0001        |
+| slti         | 111    | /       | 0111        |
 
 ### 2.5 datapath
 
@@ -246,7 +270,7 @@ ALU 根据 ALU_CONTROL 信号决定对操作数 A 和 B 进行何种运算，从
 | 0011        | b << a        | sll               |
 | 0100        | a & ~b        | /                 |
 | 0101        | a \| ~b       | /                 |
-| 0110        | a - b         | sub, beq          |
+| 0110        | a - b         | sub, beq, bne     |
 | 0111        | a < b ? 1 : 0 | slt, slti         |
 | 1000        | b >> a        | srl               |
 | 1001        | b >>> a       | sra               |
@@ -257,7 +281,7 @@ ALU 根据 ALU_CONTROL 信号决定对操作数 A 和 B 进行何种运算，从
 
 1. David Money Harris, Sarah L. Harris: *Digital Design and Computer Architecture Second Edition*
 2. [^](#12-对应机器码格式) [MIPS Instruction Set · MIPT-ILab/mipt-mips Wiki](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-Instruction-Set)
-3. [^](#24-control_unit) [361 Computer Architecture Lecture 9: Designing Single Cycle Control](http://users.ece.northwestern.edu/~kcoloma/ece361/lectures/Lec09-singlecontrol.pdf)
+3. [^](#241-main_dec) [^](#242-alu_dec) [361 Computer Architecture Lecture 9: Designing Single Cycle Control](http://users.ece.northwestern.edu/~kcoloma/ece361/lectures/Lec09-singlecontrol.pdf)
 
 ## 贡献者
 
