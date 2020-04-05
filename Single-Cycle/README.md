@@ -320,4 +320,4 @@ ALU 根据 ALU_CONTROL 信号决定对操作数 A 和 B 进行何种运算，从
 
 ## 6. 许可协议
 
-This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](./LICENSE) file for details.
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](../LICENSE) file for details.
