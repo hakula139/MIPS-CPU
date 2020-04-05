@@ -296,16 +296,28 @@ ALU 根据 ALU_CONTROL 信号决定对操作数 A 和 B 进行何种运算，从
 
 代码见[这里](./src/alu.sv)。
 
-## 参考资料
+## 3. 样例测试
+
+### 3.1 测试结果
+
+![Benchtest 1 ~ 3](./assets/test_1-3.png)
+![Benchtest 4 ~ 6](./assets/test_4-6.png)
+
+### 3.2 测试环境
+
+- OS: Windows 10 Version 2004 (OS Build 19041.172)
+- Using Vivado v2019.1 (64-bit)
+
+## 4. 参考资料
 
 1. David Money Harris, Sarah L. Harris: *Digital Design and Computer Architecture Second Edition*
 2. [^](#12-对应机器码格式) [MIPS Instruction Set · MIPT-ILab/mipt-mips Wiki](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-Instruction-Set)
 3. [^](#241-main_dec) [^](#242-alu_dec) [361 Computer Architecture Lecture 9: Designing Single Cycle Control](http://users.ece.northwestern.edu/~kcoloma/ece361/lectures/Lec09-singlecontrol.pdf)
 
-## 贡献者
+## 5. 贡献者
 
 - [**Hakula Chen**](https://github.com/hakula139)<[i@hakula.xyz](mailto:i@hakula.xyz)> - Fudan University
 
-## 许可协议
+## 6. 许可协议
 
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](./LICENSE) file for details.
