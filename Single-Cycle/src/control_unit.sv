@@ -93,7 +93,7 @@ module alu_dec (
   always_comb begin
     unique case (alu_op_i)
       3'b000: alu_control_o <= 4'd2;  // ADD (for ADDI, LW, SW)
-      3'b001: alu_control_o <= 4'd6;  // SUB (for BEQ)
+      3'b001: alu_control_o <= 4'd6;  // SUB (for BEQ, BNE)
       3'b010: alu_control_o <= 4'd0;  // AND (for ANDI)
       3'b110: alu_control_o <= 4'd1;  // OR  (for ORI)
       3'b111: alu_control_o <= 4'd7;  // SLT (for SLTI)
