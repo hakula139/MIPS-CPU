@@ -232,6 +232,25 @@ ALU 译码器。完整真值表如下 [[Ref. 3]](#参考资料)：
 
 图中 mux4 只输入了 3 个 DATA，是因为这里只需要用到 3 个。教材的电路设计中并没有用到 mux4，我引入 mux4 的目的是为了简化 pc_next 和 write_reg 的选择电路。
 
+对于 pc_next（新的 PC 值），其值的选择逻辑如下（部分符号释义见第 1 节，下同）：
+
+- 一般情况下，`pc_next` = `PC + 4`；由 `pc_src` 信号控制 `pc_branch_next_mux2` 选择，此时 `pc_src` 为 `0`
+- 对于指令 beq, bne，`pc_next` = `BTA`；由 `pc_src` 信号控制 `pc_branch_next_mux2` 选择，此时 `pc_src` 为 `1`，`jump[1:0]` 为 `00`
+- 对于指令 j, jal，`pc_next` = `JTA`；由 `jump` 信号控制 `pc_next_mux4` 选择，此时 `pc_src` 为 `1`，`jump[1:0]` 为 `01`
+- 对于指令 jr，`pc_next` = `[rs]`；由 `jump` 信号控制 `pc_next_mux4` 选择，此时 `pc_src` 为 `1`，`jump[1:0]` 为 `10`
+
+对于 write_reg（写入的目标寄存器），由 `reg_dst` 和 `jump` 信号控制 `write_reg_mux4` 选择，其值的选择逻辑如下：
+
+- 对于 I-type 指令，`write_reg` = `[rt]`；此时 `reg_dst` 为 `0`，`jump[2]` 为 `0`
+- 对于 R-type 指令，`write_reg` = `[rd]`；此时 `reg_dst` 为 `1`，`jump[2]` 为 `0`
+- 对于指令 jal，`write_reg` = `$ra`；此时 `jump[2]` 为 `1`
+
+对于 write_reg_data（写入目标寄存器的数据），其值的选择逻辑如下：
+
+- 一般情况下，`write_reg_data` = `alu_result`，其中 `alu_result` 为 ALU 运算结果；由 `mem_to_reg` 信号控制 `result_mux2` 选择，此时 `mem_to_reg` 为 `0`，`jump[2]` 为 `0`
+- 对于指令 lw，`write_reg_data` = `[Address]`；由 `mem_to_reg` 信号控制 `result_mux2` 选择，此时 `mem_to_reg` 为 `1`，`jump[2]` 为 `0`
+- 对于指令 jal，`write_reg_data` = `PC + 4`；由 `jump` 信号控制 `write_reg_data_mux2` 选择，此时 `jump[2]` 为 `1`
+
 代码见[这里](./src/utils.sv)。
 
 ### 2.9 reg_file
