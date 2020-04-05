@@ -212,13 +212,46 @@ end
 
 ### 2.9 reg_file
 
-![Register file](./assets/reg_file.png)
+![Register File](./assets/reg_file.png)
 
 寄存器文件内置了 32 个 32 位寄存器，用于读写临时数据。
 
 使用时从 A1 和 A2 分别读入地址（`0x0` ~ `0x1F`）以指定寄存器，然后从 RD1 和 RD2 分别输出对应寄存器中的 32 位数据。其中 0 号寄存器的值始终为 `0`，因此在实现中直接返回 `0`。当写使能 WE3 为 `1` 时，在时钟上升沿将数据 WD3 写入地址 WA3 指定的寄存器。当重置信号 RST 为 `1` 时，清空所有寄存器中的数据。
 
 代码见[这里](./src/reg_file.sv)。
+
+### 2.10 flip_flop
+
+![Flip-flop](./assets/flip_flop.png)
+
+触发器，用于储存 PC。
+
+在时钟上升沿将新的 PC 值 D 写入。当重置信号 RST 为 `1` 时，将 PC 异步清零。
+
+代码见[这里](./src/flip_flop.sv)。
+
+### 2.11 alu
+
+![ALU](./assets/alu.png)
+
+算术逻辑单元（ALU），用于加减、位运算等算术操作。
+
+ALU 根据 ALU_CONTROL 信号决定对操作数 A 和 B 进行何种运算，从 RESULT 输出运算结果，从 ZERO 输出结果是否为 `0`。其中 ALU_CONTROL 由控制单元根据 alu_op 和 funct 决定。具体映射表如下：
+
+| alu_control | result        |  指令             |
+|:-----------:|:-------------:|:-----------------:|
+| 0000        | a & b         | and, andi         |
+| 0001        | a \| b        | or, ori           |
+| 0010        | a + b         | add, addi, lw, sw |
+| 0011        | b << a        | sll               |
+| 0100        | a & ~b        | /                 |
+| 0101        | a \| ~b       | /                 |
+| 0110        | a - b         | sub, beq          |
+| 0111        | a < b ? 1 : 0 | slt, slti         |
+| 1000        | b >> a        | srl               |
+| 1001        | b >>> a       | sra               |
+
+代码见[这里](./src/alu.sv)。
 
 ## 参考资料
 
