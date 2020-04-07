@@ -281,7 +281,7 @@ ALU 译码器。完整真值表如下 [[Ref. 3]](#4-参考资料)：
 
 ALU 根据 ALU_CONTROL 信号决定对操作数 A 和 B 进行何种运算，从 RESULT 输出运算结果，从 ZERO 输出结果是否为 `0`。其中 ALU_CONTROL 由控制单元根据 alu_op 和 funct 决定。具体映射表如下：
 
-| alu_control | result        |  指令             |
+| alu_control | result        | 指令              |
 |:-----------:|:-------------:|:-----------------:|
 | 0000        | a & b         | and, andi         |
 | 0001        | a \| b        | or, ori           |
