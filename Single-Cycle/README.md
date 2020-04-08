@@ -39,7 +39,7 @@ nop                                     # No operation
 - `ZeroImm`：32 位 0 扩展的立即数（`= {16'b0, imm}`）
 - `Address`：`[rs] + SignImm`
 - `[Address]`：存储器单元 `Address` 地址中的内容
-- `JTA`：跳转目标地址（`= (PC + 4)[31:28], addr, 2'b0`）
+- `JTA`：跳转目标地址（`= {(PC + 4)[31:28], addr, 2'b0}`）
 - `BTA`：分支目标地址（`= PC + 4 + (SignImm << 2)`）
 
 ### 1.2 对应机器码格式
