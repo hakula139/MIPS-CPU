@@ -49,3 +49,12 @@ module sign_ext #(
 );
   assign result_o = {{(OutWidth - InWidth){a_i[InWidth - 1]}}, a_i};
 endmodule : sign_ext
+
+// 32-bit equality comparator
+module equal_cmp (
+  input        [31:0] a_i,
+  input        [31:0] b_i,
+  output logic [31:0] equal_o
+);
+  assign equal_o = a_i == b_i;
+endmodule : equal_cmp
