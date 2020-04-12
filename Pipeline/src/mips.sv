@@ -42,8 +42,6 @@ module mips (
   logic        stall_f, stall_d, flush_d, flush_e;
   logic        forward_a_d, forward_b_d, forward_a_e, forward_b_e;
 
-  assign       flush_d = pc_src_d | jump_d;
-
   fetch        u_fetch (
     .clk_i(clk),
     .rst_i(reset),
@@ -74,6 +72,7 @@ module mips (
     .flush_e_i(flush_e),
     .branch_d_o(branch_d),
     .pc_src_d_o(pc_src_d),
+    .jump_d_o(jump_d),
     .pc_branch_d_o(pc_branch_d),
     .rs_d_o(rs_d),
     .rt_d_o(rt_d),
@@ -149,6 +148,8 @@ module mips (
     .rs_d_i(rs_d),
     .rt_d_i(rt_d),
     .branch_d_i(branch_d),
+    .pc_src_d_i(pc_src_d),
+    .jump_d_i(jump_d),
     .rs_e_i(rs_e),
     .rt_e_i(rt_e),
     .write_reg_e_i(write_reg_e),
@@ -161,6 +162,7 @@ module mips (
     .reg_write_w_i(reg_write_w),
     .stall_f_o(stall_f),
     .stall_d_o(stall_d),
+    .flush_d_o(flush_d),
     .forward_a_d_o(forward_a_d),
     .forward_b_d_o(forward_b_d),
     .flush_e_o(flush_e),

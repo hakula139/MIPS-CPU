@@ -5,6 +5,8 @@ module hazard_unit (
   input        [4:0] rs_d_i,
   input        [4:0] rt_d_i,
   input        [1:0] branch_d_i,
+  input              pc_src_d_i,
+  input        [2:0] jump_d_i,
   input        [4:0] rs_e_i,
   input        [4:0] rt_e_i,
   input        [4:0] write_reg_e_i,
@@ -17,6 +19,7 @@ module hazard_unit (
   input              reg_write_w_i,
   output logic       stall_f_o,
   output logic       stall_d_o,
+  output logic       flush_d_o,
   output logic       forward_a_d_o,
   output logic       forward_b_d_o,
   output logic       flush_e_o,
@@ -58,6 +61,7 @@ module hazard_unit (
 
   assign stall_f_o = lw_stall || branch_stall;
   assign stall_d_o = stall_f_o;
+  assign flush_d_o = pc_src_d_i || jump_d_i;
   assign flush_e_o = stall_f_o;
 
 endmodule : hazard_unit

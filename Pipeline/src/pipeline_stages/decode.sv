@@ -14,6 +14,7 @@ module decode (
   input               flush_e_i,
   output logic [1:0]  branch_d_o,
   output logic        pc_src_d_o,
+  output logic [2:0]  jump_d_o,
   output logic [31:0] pc_branch_d_o,
   output logic [4:0]  rs_d_o,
   output logic [4:0]  rt_d_o,
@@ -34,7 +35,6 @@ module decode (
 );
 
   logic        equal_d, mem_to_reg_d, mem_write_d, reg_dst_d, reg_write_d;
-  logic [2:0]  jump_d;
   logic [3:0]  alu_control_d;
   logic [1:0]  alu_src_d;
   logic [12:0] control_d, control_e;
@@ -52,7 +52,7 @@ module decode (
     .mem_to_reg_o(mem_to_reg_d),
     .mem_write_o(mem_write_d),
     .branch_o(branch_d_o),
-    .jump_o(jump_d),
+    .jump_o(jump_d_o),
     .alu_control_o(alu_control_d),
     .alu_src_o(alu_src_d),
     .reg_dst_o(reg_dst_d),
@@ -60,13 +60,13 @@ module decode (
   );
   assign pc_src_d_o = (branch_d_o[0] & equal_d) | (branch_d_o[1] & ~equal_d);
   assign {reg_write_d, reg_dst_d, alu_src_d, alu_control_d,
-          jump_d, mem_write_d, mem_to_reg_d} = control_d;
+          jump_d_o, mem_write_d, mem_to_reg_d} = control_d;
 
   // Register file logic
   mux2         write_reg_data_mux2 (
     .data0_i(result_w_i),
     .data1_i(pc_plus_4_d_i),
-    .select_i(jump_d[2]),
+    .select_i(jump_d_o[2]),
     .result_o(write_reg_data_d)
   );
   reg_file     u_reg_file (
