@@ -39,7 +39,7 @@ module decode (
   logic [1:0]  alu_src_d;
   logic [12:0] control_d, control_e;
 
-  logic [31:0] reg_data_1_d, reg_data_2_d, src_a_d, src_b_d;
+  logic [31:0] write_reg_data_d, reg_data_1_d, reg_data_2_d, src_a_d, src_b_d;
 
   logic [4:0]  rd_d, shamt_d;
   logic [31:0] sign_imm_d;
@@ -63,12 +63,18 @@ module decode (
           jump_d, mem_write_d, mem_to_reg_d} = control_d;
 
   // Register file logic
+  mux2         write_reg_data_mux2 (
+    .data0_i(result_w_i),
+    .data1_i(pc_plus_4_d_i),
+    .select_i(jump_d[2]),
+    .result_o(write_reg_data_d)
+  );
   reg_file     u_reg_file (
     .clk_i,
     .rst_i,
     .we3_i(reg_write_w_i),
     .wa3_i(write_reg_w_i),
-    .wd3_i(result_w_i),
+    .wd3_i(write_reg_data_d),
     .ra1_i(instr_d_i[25:21]),
     .ra2_i(instr_d_i[20:16]),
     .rd1_o(reg_data_1_d),
