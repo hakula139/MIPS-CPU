@@ -21,6 +21,7 @@ module decode (
   output logic        reg_dst_e_o,
   output logic [1:0]  alu_src_e_o,
   output logic [3:0]  alu_control_e_o,
+  output logic [2:0]  jump_e_o,
   output logic        mem_write_e_o,
   output logic        mem_to_reg_e_o,
   output logic [31:0] reg_data_1_e_o,
@@ -28,6 +29,7 @@ module decode (
   output logic [4:0]  rs_e_o,
   output logic [4:0]  rt_e_o,
   output logic [4:0]  rd_e_o,
+  output logic [4:0]  shamt_e_o,
   output logic [31:0] sign_imm_e_o
 );
 
@@ -35,11 +37,11 @@ module decode (
   logic [2:0]  jump_d;
   logic [3:0]  alu_control_d;
   logic [1:0]  alu_src_d;
-  logic [9:0]  control_d, control_e;
+  logic [12:0] control_d, control_e;
 
   logic [31:0] reg_data_1_d, reg_data_2_d, src_a_d, src_b_d;
 
-  logic [4:0]  rd_d;
+  logic [4:0]  rd_d, shamt_d;
   logic [31:0] sign_imm_d;
 
   // Control unit logic
@@ -57,7 +59,8 @@ module decode (
     .reg_write_o(reg_write_d)
   );
   assign pc_src_d_o = (branch_d_o[0] & equal_d) | (branch_d_o[1] & ~equal_d);
-  assign {reg_write_d, reg_dst_d, alu_src_d, alu_control_d, mem_write_d, mem_to_reg_d} = control_d;
+  assign {reg_write_d, reg_dst_d, alu_src_d, alu_control_d,
+          jump_d, mem_write_d, mem_to_reg_d} = control_d;
 
   // Register file logic
   reg_file     u_reg_file (
@@ -89,9 +92,10 @@ module decode (
     .equal_o(equal_d)
   );
 
-  assign rs_d_o = instr_d_i[25:21];
-  assign rt_d_o = instr_d_i[20:16];
-  assign rd_d   = instr_d_i[15:11];
+  assign rs_d_o  = instr_d_i[25:21];
+  assign rt_d_o  = instr_d_i[20:16];
+  assign rd_d    = instr_d_i[15:11];
+  assign shamt_d = instr_d_i[10:6];
 
   // PC branch logic
   sign_ext     u_sign_ext (
@@ -115,6 +119,7 @@ module decode (
     .rs_d_i(rs_d_o),
     .rt_d_i(rt_d_o),
     .rd_d_i(rd_d),
+    .shamt_d_i(shamt_d),
     .sign_imm_d_i(sign_imm_d),
     .control_e_o(control_e),
     .reg_data_1_e_o,
@@ -122,13 +127,10 @@ module decode (
     .rs_e_o,
     .rt_e_o,
     .rd_e_o,
+    .shamt_e_o,
     .sign_imm_e_o
   );
-  assign reg_write_e_o   = control_e[9];
-  assign reg_dst_e_o     = control_e[8];
-  assign alu_src_e_o     = control_e[7:6];
-  assign alu_control_e_o = control_e[5:2];
-  assign mem_write_e_o   = control_e[1];
-  assign mem_to_reg_e_o  = control_e[0];
+  assign {reg_write_e_o, reg_dst_e_o, alu_src_e_o, alu_control_e_o,
+          jump_e_o, mem_write_e_o, mem_to_reg_e_o} = control_e;
 
 endmodule : decode

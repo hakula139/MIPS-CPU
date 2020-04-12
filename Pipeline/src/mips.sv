@@ -26,15 +26,17 @@ module mips (
   logic        reg_write_e, reg_dst_e;
   logic [1:0]  alu_src_e;
   logic [3:0]  alu_control_e;
+  logic [2:0]  jump_e;
   logic        mem_write_e, mem_to_reg_e;
   logic [31:0] reg_data_1_e, reg_data_2_e;
-  logic [4:0]  rs_e, rt_e, rd_e;
+  logic [4:0]  rs_e, rt_e, rd_e, shamt_e;
   logic [4:0]  write_reg_e;
   logic [31:0] sign_imm_e;
 
   logic        reg_write_m;
-  logic        mem_to_reg_m;
+  logic        mem_write_m, mem_to_reg_m;
   logic [31:0] alu_out_m;
+  logic [31:0] write_data_m;
   logic [4:0]  write_reg_m;
 
   logic        reg_write_w;
@@ -83,6 +85,7 @@ module mips (
     .reg_dst_e_o(reg_dst_e),
     .alu_src_e_o(alu_src_e),
     .alu_control_e_o(alu_control_e),
+    .jump_e_o(jump_e),
     .mem_write_e_o(mem_write_e),
     .mem_to_reg_e_o(mem_to_reg_e),
     .reg_data_1_e_o(reg_data_1_e),
@@ -90,7 +93,37 @@ module mips (
     .rs_e_o(rs_e),
     .rt_e_o(rt_e),
     .rd_e_o(rd_e),
+    .shamt_e_o(shamt_e),
     .sign_imm_e_o(sign_imm_e)
+  );
+
+  execute      u_execute (
+    .clk_i(clk),
+    .rst_i(reset),
+    .reg_write_e_i(reg_write_e),
+    .reg_dst_e_i(reg_dst_e),
+    .alu_src_e_i(alu_src_e),
+    .alu_control_e_i(alu_control_e),
+    .jump_e_i(jump_e),
+    .mem_write_e_i(mem_write_e),
+    .mem_to_reg_e_i(mem_to_reg_e),
+    .reg_data_1_e_i(reg_data_1_e),
+    .reg_data_2_e_i(reg_data_2_e),
+    .rt_e_i(rt_e),
+    .rd_e_i(rd_e),
+    .shamt_e_i(shamt_e),
+    .sign_imm_e_i(sign_imm_e),
+    .alu_out_m_i(alu_out_m),
+    .result_w_i(result_w),
+    .forward_a_e_i(forward_a_e),
+    .forward_b_e_i(forward_b_e),
+    .write_reg_e_o(write_reg_e),
+    .reg_write_m_o(reg_write_m),
+    .mem_write_m_o(mem_write_m),
+    .mem_to_reg_m_o(mem_to_reg_m),
+    .alu_out_m_o(alu_out_m),
+    .write_data_m_o(write_data_m),
+    .write_reg_m_o(write_reg_m)
   );
 
   hazard_unit  u_hazard_unit (
