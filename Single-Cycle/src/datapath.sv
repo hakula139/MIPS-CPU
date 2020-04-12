@@ -107,7 +107,7 @@ module datapath (
     .select_i(alu_src_i[0]),
     .result_o(src_b)
   );
-  alu       alu (
+  alu       u_alu (
     .a_i(src_a),
     .b_i(src_b),
     .alu_control_i,
