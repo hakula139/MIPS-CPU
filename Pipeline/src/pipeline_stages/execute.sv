@@ -16,7 +16,6 @@ module execute (
   input        [4:0]  rd_e_i,
   input        [4:0]  shamt_e_i,
   input        [31:0] sign_imm_e_i,
-  input        [31:0] alu_out_m_i,
   input        [31:0] result_w_i,
   input               forward_a_e_i,
   input               forward_b_e_i,
@@ -38,7 +37,7 @@ module execute (
   mux4       read_reg_data_mux4 (
     .data0_i(reg_data_1_e_i),
     .data1_i(result_w_i),
-    .data2_i(alu_out_m_i),
+    .data2_i(alu_out_m_o),
     .data3_i(),  // not used
     .select_i(forward_a_e_i),
     .result_o(read_reg_data_e)
@@ -52,7 +51,7 @@ module execute (
   mux4       write_data_mux4 (
     .data0_i(reg_data_2_e_i),
     .data1_i(result_w_i),
-    .data2_i(alu_out_m_i),
+    .data2_i(alu_out_m_o),
     .data3_i(),  // not used
     .select_i(forward_b_e_i),
     .result_o(write_data_e)

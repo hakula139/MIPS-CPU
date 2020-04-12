@@ -34,9 +34,7 @@ module mips (
   logic [31:0] sign_imm_e;
 
   logic        reg_write_m;
-  logic        mem_write_m, mem_to_reg_m;
-  logic [31:0] alu_out_m;
-  logic [31:0] write_data_m;
+  logic        mem_to_reg_m;
   logic [4:0]  write_reg_m;
 
   logic        reg_write_w;
@@ -69,7 +67,7 @@ module mips (
     .rst_i(reset),
     .pc_plus_4_d_i(pc_plus_4_d),
     .instr_d_i(instr_d),
-    .alu_out_m_i(alu_out_m),
+    .alu_out_m_i(aluout),
     .reg_write_w_i(reg_write_w),
     .write_reg_w_i(write_reg_w),
     .result_w_i(result_w),
@@ -113,16 +111,15 @@ module mips (
     .rd_e_i(rd_e),
     .shamt_e_i(shamt_e),
     .sign_imm_e_i(sign_imm_e),
-    .alu_out_m_i(alu_out_m),
     .result_w_i(result_w),
     .forward_a_e_i(forward_a_e),
     .forward_b_e_i(forward_b_e),
     .write_reg_e_o(write_reg_e),
     .reg_write_m_o(reg_write_m),
-    .mem_write_m_o(mem_write_m),
+    .mem_write_m_o(memwrite),
     .mem_to_reg_m_o(mem_to_reg_m),
-    .alu_out_m_o(alu_out_m),
-    .write_data_m_o(write_data_m),
+    .alu_out_m_o(aluout),
+    .write_data_m_o(writedata),
     .write_reg_m_o(write_reg_m)
   );
 
