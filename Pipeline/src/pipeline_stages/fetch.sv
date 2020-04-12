@@ -23,7 +23,7 @@ module fetch (
     .clk_i,
     .rst_i,
     .stall_f_i,
-    .pc_next_f_i,
+    .pc_next_f_i(pc_next_f),
     .pc_f_o
   );
   adder      u_adder (
