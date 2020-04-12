@@ -59,8 +59,8 @@ module decode (
     .reg_write_o(reg_write_d)
   );
   assign pc_src_d_o = (branch_d_o[0] & equal_d) | (branch_d_o[1] & ~equal_d);
-  assign {reg_write_d, reg_dst_d, alu_src_d, alu_control_d,
-          jump_d_o, mem_write_d, mem_to_reg_d} = control_d;
+  assign control_d  = {reg_write_d, reg_dst_d, alu_src_d, alu_control_d,
+                       jump_d_o, mem_write_d, mem_to_reg_d};
 
   // Register file logic
   mux2         write_reg_data_mux2 (

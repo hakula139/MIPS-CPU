@@ -31,7 +31,7 @@ module execute (
   logic [2:0]  control_e, control_m;
   logic [31:0] read_reg_data_e, write_data_e, src_a_e, src_b_e, alu_out_e;
 
-  assign {reg_write_e_i, mem_write_e_i, mem_to_reg_e_i} = control_e;
+  assign control_e = {reg_write_e_i, mem_write_e_i, mem_to_reg_e_i};
 
   // ALU logic
   mux4       read_reg_data_mux4 (

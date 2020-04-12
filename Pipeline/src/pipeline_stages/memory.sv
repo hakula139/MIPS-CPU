@@ -16,7 +16,7 @@ module memory (
 );
 
   logic [1:0] control_m, control_w;
-  assign {reg_write_m_i, mem_to_reg_m_i} = control_m;
+  assign control_m = {reg_write_m_i, mem_to_reg_m_i};
 
   // Writeback stage pipeline register logic
   writeback_reg u_writeback_reg (
