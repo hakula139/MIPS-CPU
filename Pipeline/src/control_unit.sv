@@ -3,10 +3,10 @@
 module control_unit (
   input        [5:0] op_i,
   input        [5:0] funct_i,
-  input              zero_i,
+  input              equal_i,
   output logic       mem_to_reg_o,
   output logic       mem_write_o,
-  output logic       pc_src_o,
+  output logic [1:0] branch_o,
   output logic [2:0] jump_o,
   output logic [3:0] alu_control_o,
   output logic [1:0] alu_src_o,
@@ -15,14 +15,13 @@ module control_unit (
 );
 
   logic [2:0] alu_op;
-  logic [1:0] branch;
 
   main_dec u_main_dec (
     .op_i,
     .funct_i,
     .mem_to_reg_o,
     .mem_write_o,
-    .branch_o(branch),
+    .branch_o,
     .jump_o,
     .alu_op_o(alu_op),
     .alu_src_o,
@@ -35,8 +34,6 @@ module control_unit (
     .alu_op_i(alu_op),
     .alu_control_o
   );
-
-  assign pc_src_o = (branch[0] & zero_i) | (branch[1] & ~zero_i);
 
 endmodule : control_unit
 

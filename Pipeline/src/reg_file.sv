@@ -16,7 +16,7 @@ module reg_file (
   logic [31:0] rf[31:0];
   integer i;
 
-  always_ff @(posedge clk_i or posedge rst_i) begin
+  always_ff @(negedge clk_i or posedge rst_i) begin
     if (rst_i) begin
       for (i = 0; i < 32; ++i) rf[i] <= '0;
     end else if (we3_i) begin
