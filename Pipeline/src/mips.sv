@@ -29,17 +29,15 @@ module mips (
   logic [2:0]  jump_e;
   logic        mem_write_e, mem_to_reg_e;
   logic [31:0] reg_data_1_e, reg_data_2_e;
-  logic [4:0]  rs_e, rt_e, rd_e, shamt_e;
-  logic [4:0]  write_reg_e;
+  logic [4:0]  rs_e, rt_e, rd_e, shamt_e, write_reg_e;
   logic [31:0] sign_imm_e;
 
-  logic        reg_write_m;
-  logic        mem_to_reg_m;
+  logic        reg_write_m, mem_to_reg_m;
   logic [4:0]  write_reg_m;
 
-  logic        reg_write_w;
+  logic        reg_write_w, mem_to_reg_w;
+  logic [31:0] read_data_w, alu_out_w, result_w;
   logic [4:0]  write_reg_w;
-  logic [31:0] result_w;
 
   logic        stall_f, stall_d, flush_d, flush_e;
   logic        forward_a_d, forward_b_d, forward_a_e, forward_b_e;
@@ -121,6 +119,30 @@ module mips (
     .alu_out_m_o(aluout),
     .write_data_m_o(writedata),
     .write_reg_m_o(write_reg_m)
+  );
+
+  memory       u_memory (
+    .clk_i(clk),
+    .rst_i(reset),
+    .reg_write_m_i(reg_write_m),
+    .mem_to_reg_m_i(mem_to_reg_m),
+    .alu_out_m_i(aluout),
+    .write_reg_m_i(write_reg_m),
+    .read_data_m_i(readdata),
+    .reg_write_w_o(reg_write_w),
+    .mem_to_reg_w_o(mem_to_reg_w),
+    .alu_out_w_o(alu_out_w),
+    .read_data_w_o(read_data_w),
+    .write_reg_w_o(write_reg_w)
+  );
+
+  writeback    u_writeback (
+    .clk_i(clk),
+    .rst_i(reset),
+    .mem_to_reg_w_i(mem_to_reg_w),
+    .alu_out_w_i(alu_out_w),
+    .read_data_w_i(read_data_w),
+    .result_w_o(result_w)
   );
 
   hazard_unit  u_hazard_unit (
