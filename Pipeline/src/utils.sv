@@ -54,7 +54,7 @@ endmodule : sign_ext
 module equal_cmp (
   input        [31:0] a_i,
   input        [31:0] b_i,
-  output logic [31:0] equal_o
+  output logic        equal_o
 );
-  assign equal_o = a_i == b_i;
+  assign equal_o = a_i == b_i ? '1 : '0;
 endmodule : equal_cmp

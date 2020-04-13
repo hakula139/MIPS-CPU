@@ -43,7 +43,7 @@ module execute (
     .result_o(read_reg_data_e)
   );
   mux2       src_a_mux2 (
-    .data0_i(read_reg_data_d),
+    .data0_i(read_reg_data_e),
     .data1_i(shamt_e_i),
     .select_i(alu_src_e_i[1]),
     .result_o(src_a_e)
