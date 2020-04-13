@@ -17,8 +17,8 @@ module decode_reg (
     .rst_i,
     .en_ni(~stall_d_i),
     .clr_i('0),
-    .d_i(pc_next_f),
-    .q_o(pc_f_o)
+    .d_i(pc_plus_4_f_i),
+    .q_o(pc_plus_4_d_o)
   );
   flip_flop instr_reg (
     .clk_i,
