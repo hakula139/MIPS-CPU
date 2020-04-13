@@ -14,7 +14,7 @@ module fetch_reg (
     .rst_i,
     .en_ni(~stall_f_i),
     .clr_i('0),
-    .d_i(pc_next_f),
+    .d_i(pc_next_f_i),
     .q_o(pc_f_o)
   );
 

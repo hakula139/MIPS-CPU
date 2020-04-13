@@ -41,7 +41,7 @@ module fetch (
     .data0_i(pc_branch_next_f),
     .data1_i({pc_plus_4_f[31:28], instr_d_o[25:0], 2'b00}),  // word aligned
     .data2_i(reg_data_1_d_i),  // the value in register $ra
-    .data3_i(),                   // not used
+    .data3_i(),                // not used
     .select_i(jump_d_i[1:0]),
     .result_o(pc_next_f)
   );
