@@ -40,7 +40,8 @@ module mips (
   logic [4:0]  write_reg_w;
 
   logic        stall_f, stall_d, flush_d, flush_e;
-  logic        forward_a_d, forward_b_d, forward_a_e, forward_b_e;
+  logic        forward_a_d, forward_b_d;
+  logic [1:0]  forward_a_e, forward_b_e;
 
   fetch        u_fetch (
     .clk_i(clk),
