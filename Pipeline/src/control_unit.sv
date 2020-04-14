@@ -60,20 +60,20 @@ module main_dec (
       6'b000000: begin
         unique casez (funct_i)
           6'b0000??: bundle <= 14'b11_10100_000_00_00;  // SLL, SRL, SRA
-          6'b001000: bundle <= 14'b0x_xxxxx_010_xx_0x;  // JR
+          6'b001000: bundle <= 14'b00_00000_010_00_00;  // JR
           default:   bundle <= 14'b11_00100_000_00_00;  // R-type
         endcase
       end
-      6'b000010: bundle <= 14'b0x_xxxxx_001_xx_0x;   // J
-      6'b000011: bundle <= 14'b10_xxxxx_101_xx_0x;   // JAL
-      6'b000100: bundle <= 14'b0x_00001_000_01_0x;   // BEQ
-      6'b000101: bundle <= 14'b0x_00001_000_10_0x;   // BNE
+      6'b000010: bundle <= 14'b00_00000_001_00_00;   // J
+      6'b000011: bundle <= 14'b10_00000_101_00_00;   // JAL
+      6'b000100: bundle <= 14'b00_00001_000_01_00;   // BEQ
+      6'b000101: bundle <= 14'b00_00001_000_10_00;   // BNE
       6'b001000: bundle <= 14'b10_01000_000_00_00;   // ADDI
       6'b001010: bundle <= 14'b10_01111_000_00_00;   // SLTI
       6'b001100: bundle <= 14'b10_01010_000_00_00;   // ANDI
       6'b001101: bundle <= 14'b10_01110_000_00_00;   // ORI
       6'b100011: bundle <= 14'b10_01000_000_00_01;   // LW
-      6'b101011: bundle <= 14'b0x_01000_000_00_1x;   // SW
+      6'b101011: bundle <= 14'b00_01000_000_00_10;   // SW
       default:   bundle <= 14'bxx_xxxxx_xxx_xx_xx;   // illegal op
     endcase
   end

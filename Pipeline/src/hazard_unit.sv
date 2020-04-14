@@ -31,16 +31,16 @@ module hazard_unit (
 
   // Solves data hazards with forwarding
   always_comb begin
-    if (!rs_e_i && rs_e_i == write_reg_m_i && reg_write_m_i) begin
+    if (rs_e_i && rs_e_i == write_reg_m_i && reg_write_m_i) begin
       forward_a_e_o <= 2'b10;
-    end else if (!rs_e_i && rs_e_i == write_reg_w_i && reg_write_w_i) begin
+    end else if (rs_e_i && rs_e_i == write_reg_w_i && reg_write_w_i) begin
       forward_a_e_o <= 2'b01;
     end else begin
       forward_a_e_o <= 2'b00;
     end
-    if (!rt_e_i && rt_e_i == write_reg_m_i && reg_write_m_i) begin
+    if (rt_e_i && rt_e_i == write_reg_m_i && reg_write_m_i) begin
       forward_b_e_o <= 2'b10;
-    end else if (!rt_e_i && rt_e_i == write_reg_w_i && reg_write_w_i) begin
+    end else if (rt_e_i && rt_e_i == write_reg_w_i && reg_write_w_i) begin
       forward_b_e_o <= 2'b01;
     end else begin
       forward_b_e_o <= 2'b00;
@@ -48,8 +48,8 @@ module hazard_unit (
   end
 
   // Solves control hazards with forwarding
-  assign forward_a_d_o = !rs_d_i && rs_d_i == write_reg_m_i && reg_write_m_i;
-  assign forward_b_d_o = !rt_d_i && rt_d_i == write_reg_m_i && reg_write_m_i;
+  assign forward_a_d_o = rs_d_i && rs_d_i == write_reg_m_i && reg_write_m_i;
+  assign forward_b_d_o = rt_d_i && rt_d_i == write_reg_m_i && reg_write_m_i;
 
   // Solves data hazards with stalls
   assign lw_stall = (rs_d_i == rt_e_i || rt_d_i == rt_e_i) && mem_to_reg_e_i;
