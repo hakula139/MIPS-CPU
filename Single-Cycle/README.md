@@ -314,6 +314,6 @@ ALU 根据 ALU_CONTROL 信号决定对操作数 A 和 B 进行何种运算，从
 
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](../LICENSE) file for details.
 
-[^1]: David Money Harris, Sarah L. Harris: *Digital Design and Computer Architecture Second Edition*
-[^2]: [MIPS Instruction Set · MIPT-ILab/mipt-mips Wiki](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-Instruction-Set)
+[^1]: David Money Harris, Sarah L. Harris: *Digital Design and Computer Architecture Second Edition*  
+[^2]: [MIPS Instruction Set · MIPT-ILab/mipt-mips Wiki](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-Instruction-Set)  
 [^3]: [361 Computer Architecture Lecture 9: Designing Single Cycle Control](http://users.ece.northwestern.edu/~kcoloma/ece361/lectures/Lec09-singlecontrol.pdf)
