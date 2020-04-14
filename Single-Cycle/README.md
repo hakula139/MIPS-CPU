@@ -299,6 +299,7 @@ ALU 根据 ALU_CONTROL 信号决定对操作数 A 和 B 进行何种运算，从
 ### 3.1 测试结果
 
 ![Benchtest 1 ~ 3](./assets/test_1-3.png)
+
 ![Benchtest 4 ~ 6](./assets/test_4-6.png)
 
 ### 3.2 测试环境
@@ -313,6 +314,8 @@ ALU 根据 ALU_CONTROL 信号决定对操作数 A 和 B 进行何种运算，从
 ## 5. 许可协议
 
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](../LICENSE) file for details.
+
+## 6. 参考资料
 
 [^1]: David Money Harris, Sarah L. Harris: *Digital Design and Computer Architecture Second Edition*  
 [^2]: [MIPS Instruction Set · MIPT-ILab/mipt-mips Wiki](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-Instruction-Set)  
