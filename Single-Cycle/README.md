@@ -1,12 +1,12 @@
 # Single-Cycle MIPS CPU
 
-32 位单周期 MIPS 指令集 CPU，使用 SystemVerilog 编写。
+32 位单周期 MIPS 指令集 CPU，使用 SystemVerilog 编写。[^1]
 
 ## 1. MIPS 指令集
 
 ### 1.1 实现指令集一览
 
-```assembly
+```assembly {.line-numbers}
 add     $rd, $rs, $rt                   # [rd] = [rs] + [rt]
 sub     $rd, $rs, $rt                   # [rd] = [rs] - [rt]
 and     $rd, $rs, $rt                   # [rd] = [rs] & [rt]
@@ -42,11 +42,9 @@ nop                                     # No operation
 - `JTA`：跳转目标地址（`= {(PC + 4)[31:28], addr, 2'b0}`）
 - `BTA`：分支目标地址（`= PC + 4 + (SignImm << 2)`）
 
-### 1.2 对应机器码格式
+### 1.2 对应机器码格式 [^2]
 
-[[Ref. 2]](#4-参考资料)
-
-```text
+```text {.line-numbers}
 add:    0000 00ss ssst tttt dddd d--- --10 0000
 sub:    0000 00ss ssst tttt dddd d--- --10 0010
 and:    0000 00ss ssst tttt dddd d--- --10 0100
@@ -115,7 +113,7 @@ CPU 核心可分为两个部分：control_unit 和 datapath，分别表示控制
 
 代码见[这里](./src/control_unit.sv)。实现中将控制信号集中赋值，省去了书写大量赋值语句的麻烦。
 
-```verilog
+```verilog {.line-numbers}
 logic [13:0] bundle;
 assign {reg_write_o, reg_dst_o, alu_src_o, alu_op_o,
         jump_o, branch_o, mem_write_o, mem_to_reg_o} = bundle;
@@ -130,7 +128,7 @@ end
 
 #### 2.4.1 main_dec
 
-主译码器。完整真值表如下 [[Ref. 3]](#4-参考资料)：
+主译码器。完整真值表如下 [^3]：
 
 | 指令   | opcode | funct   | rw | rd | alus | aluop | j   | br | mw | mr |
 |:------:|:------:|:-------:|:--:|:--:|:----:|:-----:|:---:|:--:|:--:|:--:|
@@ -173,7 +171,7 @@ end
 
 #### 2.4.2 alu_dec
 
-ALU 译码器。完整真值表如下 [[Ref. 3]](#4-参考资料)：
+ALU 译码器。完整真值表如下 [^3]：
 
 | 指令         | alu_op | funct   | alu_control |
 |:------------:|:------:|:-------:|:-----------:|
@@ -308,16 +306,14 @@ ALU 根据 ALU_CONTROL 信号决定对操作数 A 和 B 进行何种运算，从
 - OS: Windows 10 Version 2004 (OS Build 19041.172)
 - Using Vivado v2019.1 (64-bit)
 
-## 4. 参考资料
-
-1. David Money Harris, Sarah L. Harris: *Digital Design and Computer Architecture Second Edition*
-2. [^](#12-对应机器码格式) [MIPS Instruction Set · MIPT-ILab/mipt-mips Wiki](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-Instruction-Set)
-3. [^](#241-main_dec) [^](#242-alu_dec) [361 Computer Architecture Lecture 9: Designing Single Cycle Control](http://users.ece.northwestern.edu/~kcoloma/ece361/lectures/Lec09-singlecontrol.pdf)
-
-## 5. 贡献者
+## 4. 贡献者
 
 - [**Hakula Chen**](https://github.com/hakula139)<[i@hakula.xyz](mailto:i@hakula.xyz)> - Fudan University
 
-## 6. 许可协议
+## 5. 许可协议
 
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](../LICENSE) file for details.
+
+[^1]: David Money Harris, Sarah L. Harris: *Digital Design and Computer Architecture Second Edition*
+[^2]: [MIPS Instruction Set · MIPT-ILab/mipt-mips Wiki](https://github.com/MIPT-ILab/mipt-mips/wiki/MIPS-Instruction-Set)
+[^3]: [361 Computer Architecture Lecture 9: Designing Single Cycle Control](http://users.ece.northwestern.edu/~kcoloma/ece361/lectures/Lec09-singlecontrol.pdf)
