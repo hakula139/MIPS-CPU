@@ -73,7 +73,7 @@ module execute (
 
   // Write register logic
   mux2       write_reg_data_mux2 (
-    .data0_i(write_data_e),
+    .data0_i(alu_out_e),
     .data1_i(pc_plus_4_e_i),
     .select_i(jump_e_i[2]),
     .result_o(write_reg_data_e)
@@ -92,8 +92,8 @@ module execute (
     .clk_i,
     .rst_i,
     .control_e_i(control_e),
-    .alu_out_e_i(alu_out_e),
-    .write_data_e_i(write_reg_data_e),
+    .alu_out_e_i(write_reg_data_e),
+    .write_data_e_i(write_data_e),
     .write_reg_e_i(write_reg_e_o),
     .control_m_o(control_m),
     .alu_out_m_o,
