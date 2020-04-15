@@ -59,9 +59,9 @@ module hazard_unit (
       && (reg_write_e_i && (rs_d_i == write_reg_e_i || rt_d_i == write_reg_e_i)
       || mem_to_reg_m_i && (rs_d_i == write_reg_m_i || rt_d_i == write_reg_m_i));
 
-  assign stall_f_o = lw_stall || branch_stall;
-  assign stall_d_o = stall_f_o;
+  assign flush_e_o = lw_stall || branch_stall;
+  assign stall_d_o = flush_e_o;
   assign flush_d_o = pc_src_d_i || jump_d_i;
-  assign flush_e_o = stall_f_o;
+  assign stall_f_o = stall_d_o;
 
 endmodule : hazard_unit

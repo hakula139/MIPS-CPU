@@ -16,6 +16,7 @@ module decode (
   output logic        pc_src_d_o,
   output logic [2:0]  jump_d_o,
   output logic [31:0] pc_branch_d_o,
+  output logic [31:0] reg_data_1_d_o,
   output logic [4:0]  rs_d_o,
   output logic [4:0]  rt_d_o,
   output logic        reg_write_e_o,
@@ -25,6 +26,7 @@ module decode (
   output logic [2:0]  jump_e_o,
   output logic        mem_write_e_o,
   output logic        mem_to_reg_e_o,
+  output logic [31:0] pc_plus_4_e_o,
   output logic [31:0] reg_data_1_e_o,
   output logic [31:0] reg_data_2_e_o,
   output logic [4:0]  rs_e_o,
@@ -39,7 +41,7 @@ module decode (
   logic [1:0]  alu_src_d;
   logic [12:0] control_d, control_e;
 
-  logic [31:0] write_reg_data_d, reg_data_1_d, reg_data_2_d, src_a_d, src_b_d;
+  logic [31:0] reg_data_2_d, src_a_d, src_b_d;
 
   logic [4:0]  rd_d, shamt_d;
   logic [31:0] sign_imm_d;
@@ -63,25 +65,19 @@ module decode (
                        jump_d_o, mem_write_d, mem_to_reg_d};
 
   // Register file logic
-  mux2         write_reg_data_mux2 (
-    .data0_i(result_w_i),
-    .data1_i(pc_plus_4_d_i),
-    .select_i(jump_d_o[2]),
-    .result_o(write_reg_data_d)
-  );
   reg_file     u_reg_file (
     .clk_i,
     .rst_i,
     .we3_i(reg_write_w_i),
     .wa3_i(write_reg_w_i),
-    .wd3_i(write_reg_data_d),
+    .wd3_i(result_w_i),
     .ra1_i(instr_d_i[25:21]),
     .ra2_i(instr_d_i[20:16]),
-    .rd1_o(reg_data_1_d),
+    .rd1_o(reg_data_1_d_o),
     .rd2_o(reg_data_2_d)
   );
   mux2         src_a_mux2 (
-    .data0_i(reg_data_1_d),
+    .data0_i(reg_data_1_d_o),
     .data1_i(alu_out_m_i),
     .select_i(forward_a_d_i),
     .result_o(src_a_d)
@@ -120,7 +116,8 @@ module decode (
     .rst_i,
     .flush_e_i,
     .control_d_i(control_d),
-    .reg_data_1_d_i(reg_data_1_d),
+    .pc_plus_4_d_i,
+    .reg_data_1_d_i(reg_data_1_d_o),
     .reg_data_2_d_i(reg_data_2_d),
     .rs_d_i(rs_d_o),
     .rt_d_i(rt_d_o),
@@ -128,6 +125,7 @@ module decode (
     .shamt_d_i(shamt_d),
     .sign_imm_d_i(sign_imm_d),
     .control_e_o(control_e),
+    .pc_plus_4_e_o,
     .reg_data_1_e_o,
     .reg_data_2_e_o,
     .rs_e_o,

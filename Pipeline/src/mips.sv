@@ -28,7 +28,7 @@ module mips (
   logic [3:0]  alu_control_e;
   logic [2:0]  jump_e;
   logic        mem_write_e, mem_to_reg_e;
-  logic [31:0] reg_data_1_e, reg_data_2_e;
+  logic [31:0] pc_plus_4_e, reg_data_1_e, reg_data_2_e;
   logic [4:0]  rs_e, rt_e, rd_e, shamt_e, write_reg_e;
   logic [31:0] sign_imm_e;
 
@@ -75,6 +75,7 @@ module mips (
     .pc_src_d_o(pc_src_d),
     .jump_d_o(jump_d),
     .pc_branch_d_o(pc_branch_d),
+    .reg_data_1_d_o(reg_data_1_d),
     .rs_d_o(rs_d),
     .rt_d_o(rt_d),
     .reg_write_e_o(reg_write_e),
@@ -84,6 +85,7 @@ module mips (
     .jump_e_o(jump_e),
     .mem_write_e_o(mem_write_e),
     .mem_to_reg_e_o(mem_to_reg_e),
+    .pc_plus_4_e_o(pc_plus_4_e),
     .reg_data_1_e_o(reg_data_1_e),
     .reg_data_2_e_o(reg_data_2_e),
     .rs_e_o(rs_e),
@@ -103,6 +105,7 @@ module mips (
     .jump_e_i(jump_e),
     .mem_write_e_i(mem_write_e),
     .mem_to_reg_e_i(mem_to_reg_e),
+    .pc_plus_4_e_i(pc_plus_4_e),
     .reg_data_1_e_i(reg_data_1_e),
     .reg_data_2_e_i(reg_data_2_e),
     .rt_e_i(rt_e),

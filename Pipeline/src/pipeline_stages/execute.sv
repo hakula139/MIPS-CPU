@@ -10,6 +10,7 @@ module execute (
   input        [2:0]  jump_e_i,
   input               mem_write_e_i,
   input               mem_to_reg_e_i,
+  input        [31:0] pc_plus_4_e_i,
   input        [31:0] reg_data_1_e_i,
   input        [31:0] reg_data_2_e_i,
   input        [4:0]  rt_e_i,
@@ -29,7 +30,7 @@ module execute (
 );
 
   logic [2:0]  control_e, control_m;
-  logic [31:0] read_reg_data_e, write_data_e, src_a_e, src_b_e, alu_out_e;
+  logic [31:0] read_reg_data_e, write_reg_data_e, write_data_e, src_a_e, src_b_e, alu_out_e;
 
   assign control_e = {reg_write_e_i, mem_write_e_i, mem_to_reg_e_i};
 
@@ -70,6 +71,13 @@ module execute (
     .zero_o()  // not used
   );
 
+  // Write register logic
+  mux2       write_reg_data_mux2 (
+    .data0_i(write_data_e),
+    .data1_i(pc_plus_4_e_i),
+    .select_i(jump_e_i[2]),
+    .result_o(write_reg_data_e)
+  );
   mux4 #(5)  write_reg_mux4 (
     .data0_i(rt_e_i),
     .data1_i(rd_e_i),
@@ -85,7 +93,7 @@ module execute (
     .rst_i,
     .control_e_i(control_e),
     .alu_out_e_i(alu_out_e),
-    .write_data_e_i(write_data_e),
+    .write_data_e_i(write_reg_data_e),
     .write_reg_e_i(write_reg_e_o),
     .control_m_o(control_m),
     .alu_out_m_o,

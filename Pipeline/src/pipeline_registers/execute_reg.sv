@@ -6,6 +6,7 @@ module execute_reg (
   input               rst_i,
   input               flush_e_i,
   input        [12:0] control_d_i,
+  input        [31:0] pc_plus_4_d_i,
   input        [31:0] reg_data_1_d_i,
   input        [31:0] reg_data_2_d_i,
   input        [4:0]  rs_d_i,
@@ -14,6 +15,7 @@ module execute_reg (
   input        [4:0]  shamt_d_i,
   input        [31:0] sign_imm_d_i,
   output logic [12:0] control_e_o,
+  output logic [31:0] pc_plus_4_e_o,
   output logic [31:0] reg_data_1_e_o,
   output logic [31:0] reg_data_2_e_o,
   output logic [4:0]  rs_e_o,
@@ -30,6 +32,14 @@ module execute_reg (
     .clr_i(flush_e_i),
     .d_i(control_d_i),
     .q_o(control_e_o)
+  );
+  flip_flop       pc_plus_4_reg (
+    .clk_i,
+    .rst_i,
+    .en_ni('1),
+    .clr_i(flush_e_i),
+    .d_i(pc_plus_4_d_i),
+    .q_o(pc_plus_4_e_o)
   );
   flip_flop       reg_data_1_reg (
     .clk_i,
