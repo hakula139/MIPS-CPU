@@ -36,6 +36,46 @@
 
 代码见[这里](./src/mips.sv)。
 
+### 2.2 fetch
+
+![Fetch stage](./assets/fetch.png)
+
+Fetch 阶段，通过 pc_f 输出指令地址 PC 到 imem，从 imem 取得的指令通过 instr_f 读入，存储到流水线寄存器 decode_reg 中，在下一个时钟上升沿到达时从 instr_d 输出。
+
+此外，本阶段还需要完成 PC 的更新。pc_next（新的 PC 值）的选择逻辑同单周期实验报告第 2.8 节所述，这里就不再赘述了。需要注意的是 Fetch 阶段需要用到一些 Decode 阶段的数据，也就是上一条指令计算得到的相对寻址地址 `pc_branch_d`、用于指令 jr 跳转的 `reg_data_1_d`（此时为寄存器 `$ra` 存储的地址值）、指令解析得到的 `pc_src_d`, `jump_d` 信号，用来确定 pc_next 的值。
+
+在需要解决冲突的情况下，通过 `stall_f`, `stall_d`, `flush_d` 信号决定是否保持（stall）或清空（flush）对应流水线寄存器保存的数据，其中 `stall_f` 为 `1` 时保持当前 PC 值不更新，`stall_d` 为 `1` 时保持当前 decode_reg 的数据不更新，`flush_d` 为 `1` 时清空 decode_reg 的数据。具体这些信号在何时为何值，将在 hazard_unit 章节详细阐述。
+
+代码见[这里](./src/pipeline_stages/fetch.sv)。
+
+#### 2.2.1 fetch_reg
+
+![Fetch stage pipeline register](./assets/fetch_reg.png)
+
+Fetch 阶段流水线寄存器。结构很简单，就是将 PC 寄存器 pc_reg 封装了一下。但相较于单周期版本的 flip_flop，流水线版本做了一些调整。
+
+代码见[这里](./src/pipeline_registers/fetch_reg.sv)。
+
+##### 2.2.1.1 flip_flop
+
+![Flip-flop](./assets/flip_flop.png)
+
+这里只说与单周期版本的区别，其余请参见单周期实验报告第 2.10 节。
+
+首先增加了一个清零信号 CLR，当 CLR 为 `1` 时，将保存的数据同步清零（RST 为异步清零），用于 `flush` 信号。尽管这里 fetch_reg 并不需要用到，但其他流水线寄存器可能会需要，这里是出于部件复用的考虑。其次增加了一个**低电平**有效的保持信号 EN，当 EN 为 `0` 时，保持数据不变。对于 fetch_reg 来说，其值即 `~stall_f`。
+
+代码见[这里](./src/flip_flop.sv)。
+
+#### 2.2.2 decode_reg
+
+![Decode stage pipeline register](./assets/decode_reg.png)
+
+Fetch 阶段和 Decode 阶段之间的流水线寄存器。中转一下 `instr` 和 `pc_plus_4`。为什么需要用触发器中转数据？因为流水线上需要同时跑多条指令（这里是 5 条），需要控制每个阶段各自只在执行一条指令。
+
+这里 instr_reg 的 CLR 信号为 `~stall_d_i & flush_d_i`，是为了使 `stall_d` 和 `flush_d` 信号互斥，且强制 `stall_d` 的优先级更高（当 `stall_d` 为 `1` 时，`flush_d` 无效，不允许清零），否则当两者同时为 `1` 时会导致错误（因为在触发器的实现中，`flush` 的优先级更高，这将导致指令丢失）。pc_plus_4_reg 不需要清零，因此 CLR 信号恒为 `0`。
+
+代码见[这里](./src/pipeline_registers/decode_reg.sv)。
+
 ## 3. 样例测试
 
 ### 3.1 测试结果
