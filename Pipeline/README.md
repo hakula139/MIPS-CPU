@@ -40,9 +40,9 @@
 
 ![Fetch stage](./assets/fetch.png)
 
-Fetch 阶段，通过 pc_f 输出指令地址 PC 到 imem，从 imem 取得的指令通过 instr_f 读入，存储到流水线寄存器 decode_reg 中，在下一个时钟上升沿到达时从 instr_d 输出。
+Fetch 阶段，通过 pc_f 输出指令地址 `pc` 到 imem，通过 instr_f 从 imem 读入指令 `instr`，存储到流水线寄存器 decode_reg 中，在下一个时钟上升沿到达时从 instr_d 输出。
 
-此外，本阶段还需要完成 PC 的更新。pc_next（新的 PC 值）的选择逻辑同单周期实验报告第 2.8 节所述，这里就不再赘述了。需要注意的是 Fetch 阶段需要用到一些 Decode 阶段的数据，也就是上一条指令计算得到的相对寻址地址 `pc_branch_d`、用于指令 jr 跳转的 `reg_data_1_d`（此时为寄存器存储的地址值）、指令解析得到的 `pc_src_d`, `jump_d` 信号，用来确定 pc_next 的值。
+此外，本阶段还需要完成 PC 的更新。`pc_next`（新的 PC 值）的选择逻辑同单周期实验报告第 2.8 节所述，这里就不再赘述了。需要注意的是 Fetch 阶段需要用到一些 Decode 阶段的数据，也就是上一条指令计算得到的相对寻址地址 `pc_branch_d`、用于指令 jr 跳转的 `reg_data_1_d`（此时为寄存器存储的地址值）、指令解析得到的 `pc_src_d`, `jump_d` 信号，用来确定 pc_next 的值。
 
 在需要解决冲突的情况下，通过 `stall_f`, `stall_d`, `flush_d` 信号决定是否保持（stall）或清空（flush）对应流水线寄存器保存的数据，其中 `stall_f` 为 `1` 时保持当前 PC 值不更新，`stall_d` 为 `1` 时保持当前 decode_reg 的数据不更新，`flush_d` 为 `1` 时清空 decode_reg 的数据。具体这些信号在何时为何值，将在 hazard_unit 章节详细阐述，下同。
 
@@ -88,7 +88,7 @@ Decode 阶段，读入指令 `instr_d`，由控制单元 control_unit 解析，�
 
 作为**静态分支预测**，本阶段新增了比较器 equal_cmp，用来比较从寄存器中读出的两个数 `src_a`, `src_b` 是否相等，其作用是将指令 beq, bne 的比较过程提前到 Decode 阶段，提前得到 `pc_src` 信号，从而提高效率。这里需要用到 Memory 阶段的数据 `alu_out_m` 以应对数据冒险，`src_a`, `src_b` 取值的选择由 `forward_a_d`, `forward_b_d` 信号控制。
 
-在实现中，将寄存器文件 reg_file 放在了 Decode 模块里，因此 Writeback 阶段的寄存器写入操作也将在这里完成。所以这里需要用到一些 Writeback 阶段的数据，也就是 `reg_write_w` 信号、目标寄存器 `write_reg_w`、写入数据 `result_w`。
+在实现中，将寄存器文件 reg_file 放在了 decode 模块里，因此 Writeback 阶段的寄存器写入操作也将在这里完成。所以这里需要用到一些 Writeback 阶段的数据，也就是 `reg_write_w` 信号、目标寄存器 `write_reg_w`、写入数据 `result_w`。
 
 在需要解决冲突的情况下，通过 `stall_e`, `flush_e` 信号决定是否保持或清空 execute_reg 保存的数据。
 
@@ -150,6 +150,35 @@ Execute 阶段和 Memory 阶段之间的流水线寄存器。中转一下 `contr
 - `write_reg` 是之后写入 reg_file 的目标寄存器；对于指令 jal，则为 `$ra`
 
 代码见[这里](./src/pipeline_registers/memory_reg.sv)。
+
+### 2.5 memory
+
+![Memory stage](./assets/memory.png)
+
+Memory 阶段，当 `mem_write` 为 `1` 时，在 dmem 的目标地址 `alu_out` 存储需要写入的数据 `write_data`。不过实际上这件事情并不是在 memory 模块内完成的，因为 dmem 在 mips 外面。因此实现中是在 execute 模块通过 mem_write_m, alu_out_m, write_data_m 将 `mem_write`, `alu_out`, `write_data` 直接输出到 dmem，在下一个时钟上升沿到达时（即 Memory 阶段）写入 dmem。memory 模块内则是通过 read_data_m 从 dmem 读入数据 `read_data`。
+
+代码见[这里](./src/pipeline_stages/memory.sv)。
+
+#### 2.5.1 writeback_reg
+
+![Writeback stage pipeline register](./assets/writeback_reg.png)
+
+Memory 阶段和 Writeback 阶段之间的流水线寄存器。中转一下 `control`, `alu_out`, `read_data`, `write_reg`，其中：
+
+- `control` 是控制信号 `reg_write`, `mem_to_reg` 的集合
+- `read_data` 是可能需要写入 reg_file 的数据
+
+代码见[这里](./src/pipeline_registers/writeback_reg.sv)。
+
+### 2.6 writeback
+
+![Writeback stage](./assets/writeback.png)
+
+Writeback 阶段，由 `mem_to_reg` 信号控制 result_mux2 选择写入 reg_file 的数据为 `alu_out` 还是 `read_data`。
+
+写入逻辑放在了 decode 模块，参见第 2.3 节。
+
+代码见[这里](./src/pipeline_stages/writeback.sv)。
 
 ## 3. 样例测试
 
