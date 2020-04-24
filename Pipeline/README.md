@@ -275,6 +275,12 @@ assign flush_d_o = pc_src_d_i || jump_d_i;
 - OS: Windows 10 Version 2004 (OS Build 19041.172)
 - Using Vivado v2019.1 (64-bit)
 
+### 3.3 测试分析
+
+可以看到本实现的 CPI 偏高，经观察发现主要是 bubble sort 的样例 CPI 较高（达到了 `1.8`），其余样例的 CPI 普遍在 `1.2` 级别。分析原因可能在于其中的循环较多，而静态分支预测对循环并不友好，跳转指令的 CPI 通常为 `2`。如果引入动态分支预测，则跳转指令的 CPI 将更接近 `1`，从而大幅降低整体 CPI。
+
+由于时间有限，未能有机会实现动态分支预测，因此仅在此做理论上的分析。
+
 ## 4. 贡献者
 
 - [**Hakula Chen**](https://github.com/hakula139)<[i@hakula.xyz](mailto:i@hakula.xyz)> - Fudan University
