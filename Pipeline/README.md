@@ -272,7 +272,7 @@ assign flush_d_o = pc_src_d_i || jump_d_i;
 
 ### 3.2 测试环境
 
-- OS: Windows 10 Version 2004 (OS Build 19041.172)
+- OS: Windows 10 Version 2004 (OS Build 19041.207)
 - Using Vivado v2019.1 (64-bit)
 
 ### 3.3 测试分析
