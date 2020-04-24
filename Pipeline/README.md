@@ -180,6 +180,88 @@ Writeback 阶段，由 `mem_to_reg` 信号控制 result_mux2 选择写入 reg_fi
 
 代码见[这里](./src/pipeline_stages/writeback.sv)。
 
+### 2.7 hazard_unit
+
+![Hazard Unit](./assets/hazard_unit.png)
+
+冲突单元根据传入的各阶段寄存器和控制信号，检查是否存在数据冲突或控制冲突，并输出相应的控制信号（forward, stall, flush）以处理冲突。
+
+代码见[这里](./src/hazard_unit.sv)。
+
+#### 2.7.1 数据冲突
+
+当一条指令依赖于另一条指令的结果，而此结果还未写入寄存器文件时，将发生写后读（Read After Write, RAW）数据冲突。解决 RAW 冲突的方法：如果此时这个结果已经在某个阶段被计算出来，那么可以使用重定向（forwarding）将数据转发过来；否则需要阻塞（stall）流水线直到结果可用。需注意，`$0` 寄存器硬连接为 `0`，因此源寄存器为 `$0` 时不需要进行转发或阻塞。以下将阐述这两种方法的具体实现。
+
+##### 2.7.1.1 使用重定向解决冲突
+
+当 Execute 阶段的源寄存器 `$rs` 或 `$rt` 与 Memory 阶段或 Writeback 阶段（即前两条指令）的写入目标寄存器 `write_reg` 相同，且其 `reg_write` 信号为 `1` 时（即需要写入目标寄存器），重定向对应的 `src_a` 或 `src_b`。以 `$rs` 的情况为例（`$rt` 同理），重定向逻辑如下：
+
+```verilog {.line-numbers}
+if (rs_e_i && rs_e_i == write_reg_m_i && reg_write_m_i) begin
+  forward_a_e_o <= 2'b10;
+end else if (rs_e_i && rs_e_i == write_reg_w_i && reg_write_w_i) begin
+  forward_a_e_o <= 2'b01;
+end else begin
+  forward_a_e_o <= 2'b00;
+end
+```
+
+其中当 `forward_a_e` 为 `10` 时，Memory 阶段转发的数据是 `alu_out_m`；当 `forward_a_e` 为 `01` 时，Writeback 阶段转发的数据是 `result_w`。
+
+需注意这里 Memory 阶段的优先级高于 Writeback 阶段，因为 Memory 阶段的指令后执行，包含的数据更新。
+
+##### 2.7.1.2 使用阻塞解决冲突
+
+对于指令 lw，因为它有两个周期的延迟，意味着其他指令至少要到两个周期后才能使用它的结果。如果指令 lw 后紧接着一个使用其结果的指令，则使用重定向无法解决这种冲突，此时需要阻塞流水线。现实中，编译器会针对这种情况做一定的优化，通过调整指令顺序，在发生数据冲突的两条指令间插入一条无关指令，从而避免这种冲突。
+
+当 Execute 阶段正在执行的指令是 lw（此时 `mem_to_reg` 信号为 `1`），且 Decode 阶段的任一源操作数 `$rs` 或 `$rt` 与 Execute 阶段的目的寄存器 `$rt` 相同，阻塞 Decode 阶段直到源操作数准备好。阻塞逻辑如下：
+
+```verilog {.line-numbers}
+assign lw_stall = (rs_d_i == rt_e_i || rt_d_i == rt_e_i) && mem_to_reg_e_i;
+
+assign flush_e_o = lw_stall;
+assign stall_d_o = flush_e_o;
+assign stall_f_o = stall_d_o;
+```
+
+这里阻塞 Decode 阶段的同时也要阻塞 Fetch 阶段，并且刷新（flush）Execute 阶段，产生气泡。
+
+#### 2.7.2 控制冲突
+
+在取下一条指令时还不能确定指令地址时，将发生控制冲突，即处理器不知道应该取哪条指令。解决控制冲突的方法：预测下一条指令地址，如果预测错误则刷新流水线。目前的实现中使用的是静态分支预测，事实上动态分支预测可以获得更高的性能。
+
+然而，静态分支预测将导致新的 RAW 冲突，因此需要再次使用第 2.7.1 节解决数据冲突时的两种方法。
+
+##### 2.7.2.1 使用重定向解决冲突
+
+如果指令的结果在 Writeback 阶段，则它将在前半周期写入寄存器，而在后半周期进行读操作，此时不会产生冲突。如果指令的结果在 Memory 阶段，则可以将它重定向回 Decode 阶段的 equal_cmp。类似第 2.7.1.1 节，以 `$rs` 的情况为例（`$rt` 同理），重定向逻辑如下：
+
+```verilog {.line-numbers}
+assign forward_a_d_o = rs_d_i && rs_d_i == write_reg_m_i && reg_write_m_i;
+```
+
+##### 2.7.2.2 使用阻塞解决冲突
+
+如果指令的结果在 Execute 阶段，或者指令 lw 的结果在 Memory 阶段，则需要阻塞流水线。类似第 2.7.1.2 节，阻塞逻辑如下：
+
+```verilog {.line-numbers}
+assign branch_stall = branch_d_i
+    && (reg_write_e_i && (rs_d_i == write_reg_e_i || rt_d_i == write_reg_e_i)
+    || mem_to_reg_m_i && (rs_d_i == write_reg_m_i || rt_d_i == write_reg_m_i));
+
+assign flush_e_o = lw_stall || branch_stall;
+assign stall_d_o = flush_e_o;
+assign stall_f_o = stall_d_o;
+```
+
+##### 2.7.2.3 清除无效数据
+
+当发生跳转时，需要清除跳转指令之后多读的一条无效指令，即刷新 Decode 阶段，产生气泡。刷新逻辑如下：
+
+```verilog {.line-numbers}
+assign flush_d_o = pc_src_d_i || jump_d_i;
+```
+
 ## 3. 样例测试
 
 ### 3.1 测试结果
