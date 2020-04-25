@@ -100,7 +100,7 @@ Decode 阶段，读入指令 `instr_d`，由控制单元 control_unit 解析，�
 
 32 位比较器，用于比较两个数是否相等。
 
-使用时读入 A 和 B，若 A 和 B 相等则从 RESULT 输出 `1`。
+使用时读入 A 和 B，若 A 和 B 相等则从 EQUAL 输出 `1`。
 
 代码见[这里](./src/utils.sv)。
 
