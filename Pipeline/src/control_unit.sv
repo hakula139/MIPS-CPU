@@ -62,7 +62,7 @@ module main_dec (
     unique case (op_i)
       6'b000000: begin
         unique casez (funct_i)
-          6'b0000??: bundle <= 15'b1_11_10100_000_00_00;  // SLL, SRL, SRA
+          6'b0000??: bundle <= 15'b0_11_10100_000_00_00;  // SLL, SRL, SRA
           6'b001000: bundle <= 15'b0_00_00000_010_00_00;  // JR
           default:   bundle <= 15'b0_11_00100_000_00_00;  // R-type
         endcase
