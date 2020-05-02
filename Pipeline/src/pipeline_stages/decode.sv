@@ -16,7 +16,7 @@ module decode (
   output logic        pc_src_d_o,
   output logic [2:0]  jump_d_o,
   output logic [31:0] pc_branch_d_o,
-  output logic [31:0] reg_data_1_d_o,
+  output logic [31:0] src_a_d_o,
   output logic [4:0]  rs_d_o,
   output logic [4:0]  rt_d_o,
   output logic        reg_write_e_o,
@@ -41,7 +41,7 @@ module decode (
   logic [1:0]  alu_src_d;
   logic [12:0] control_d, control_e;
 
-  logic [31:0] reg_data_2_d, src_a_d, src_b_d;
+  logic [31:0] reg_data_1_d, reg_data_2_d, src_b_d;
 
   logic [4:0]  rd_d, shamt_d;
   logic [31:0] ext_imm_d;
@@ -74,14 +74,14 @@ module decode (
     .wd3_i(result_w_i),
     .ra1_i(instr_d_i[25:21]),
     .ra2_i(instr_d_i[20:16]),
-    .rd1_o(reg_data_1_d_o),
+    .rd1_o(reg_data_1_d),
     .rd2_o(reg_data_2_d)
   );
   mux2         src_a_mux2 (
-    .data0_i(reg_data_1_d_o),
+    .data0_i(reg_data_1_d),
     .data1_i(alu_out_m_i),
     .select_i(forward_a_d_i),
-    .result_o(src_a_d)
+    .result_o(src_a_d_o)
   );
   mux2         src_b_mux2 (
     .data0_i(reg_data_2_d),
@@ -90,7 +90,7 @@ module decode (
     .result_o(src_b_d)
   );
   equal_cmp    u_equal_cmp (
-    .a_i(src_a_d),
+    .a_i(src_a_d_o),
     .b_i(src_b_d),
     .equal_o(equal_d)
   );
@@ -119,7 +119,7 @@ module decode (
     .flush_e_i,
     .control_d_i(control_d),
     .pc_plus_4_d_i,
-    .reg_data_1_d_i(reg_data_1_d_o),
+    .reg_data_1_d_i(reg_data_1_d),
     .reg_data_2_d_i(reg_data_2_d),
     .rs_d_i(rs_d_o),
     .rt_d_i(rt_d_o),

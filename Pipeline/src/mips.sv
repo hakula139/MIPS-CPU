@@ -18,7 +18,7 @@ module mips (
   logic [1:0]  branch_d;
   logic        pc_src_d;
   logic [31:0] pc_branch_d, pc_plus_4_d;
-  logic [31:0] reg_data_1_d;
+  logic [31:0] src_a_d;
   logic [2:0]  jump_d;
   logic [31:0] instr_d;
   logic [4:0]  rs_d, rt_d;
@@ -49,7 +49,7 @@ module mips (
     .instr_f_i(instr),
     .pc_branch_d_i(pc_branch_d),
     .pc_src_d_i(pc_src_d),
-    .reg_data_1_d_i(reg_data_1_d),
+    .src_a_d_i(src_a_d),
     .jump_d_i(jump_d),
     .stall_f_i(stall_f),
     .stall_d_i(stall_d),
@@ -75,7 +75,7 @@ module mips (
     .pc_src_d_o(pc_src_d),
     .jump_d_o(jump_d),
     .pc_branch_d_o(pc_branch_d),
-    .reg_data_1_d_o(reg_data_1_d),
+    .src_a_d_o(src_a_d),
     .rs_d_o(rs_d),
     .rt_d_o(rt_d),
     .reg_write_e_o(reg_write_e),

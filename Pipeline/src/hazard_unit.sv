@@ -55,12 +55,12 @@ module hazard_unit (
   assign lw_stall = (rs_d_i == rt_e_i || rt_d_i == rt_e_i) && mem_to_reg_e_i;
 
   // Solves control hazards with stalls
-  assign branch_stall = branch_d_i
+  assign branch_stall = (branch_d_i || jump_d_i[1])
       && (reg_write_e_i && (rs_d_i == write_reg_e_i || rt_d_i == write_reg_e_i)
       || mem_to_reg_m_i && (rs_d_i == write_reg_m_i || rt_d_i == write_reg_m_i));
 
-  assign flush_e_o = lw_stall || branch_stall;
-  assign stall_d_o = flush_e_o;
+  assign stall_d_o = lw_stall || branch_stall;
+  assign flush_e_o = stall_d_o;
   assign flush_d_o = pc_src_d_i || jump_d_i;
   assign stall_f_o = stall_d_o;
 
