@@ -11,7 +11,8 @@ module control_unit (
   output logic [3:0] alu_control_o,
   output logic [1:0] alu_src_o,
   output logic       reg_dst_o,
-  output logic       reg_write_o
+  output logic       reg_write_o,
+  output logic       sign_o
 );
 
   logic [2:0] alu_op;
@@ -26,7 +27,8 @@ module control_unit (
     .alu_op_o(alu_op),
     .alu_src_o,
     .reg_dst_o,
-    .reg_write_o
+    .reg_write_o,
+    .sign_o
   );
 
   alu_dec  u_alu_dec (
@@ -48,33 +50,34 @@ module main_dec (
   output logic [2:0] alu_op_o,
   output logic [1:0] alu_src_o,
   output logic       reg_dst_o,
-  output logic       reg_write_o
+  output logic       reg_write_o,
+  output logic       sign_o
 );
 
-  logic [13:0] bundle;
-  assign {reg_write_o, reg_dst_o, alu_src_o, alu_op_o,
+  logic [14:0] bundle;
+  assign {sign_o, reg_write_o, reg_dst_o, alu_src_o, alu_op_o,
           jump_o, branch_o, mem_write_o, mem_to_reg_o} = bundle;
 
   always_comb begin
     unique case (op_i)
       6'b000000: begin
         unique casez (funct_i)
-          6'b0000??: bundle <= 14'b11_10100_000_00_00;  // SLL, SRL, SRA
-          6'b001000: bundle <= 14'b00_00000_010_00_00;  // JR
-          default:   bundle <= 14'b11_00100_000_00_00;  // R-type
+          6'b0000??: bundle <= 15'b1_11_10100_000_00_00;  // SLL, SRL, SRA
+          6'b001000: bundle <= 15'b0_00_00000_010_00_00;  // JR
+          default:   bundle <= 15'b0_11_00100_000_00_00;  // R-type
         endcase
       end
-      6'b000010: bundle <= 14'b00_00000_001_00_00;   // J
-      6'b000011: bundle <= 14'b10_00000_101_00_00;   // JAL
-      6'b000100: bundle <= 14'b00_00001_000_01_00;   // BEQ
-      6'b000101: bundle <= 14'b00_00001_000_10_00;   // BNE
-      6'b001000: bundle <= 14'b10_01000_000_00_00;   // ADDI
-      6'b001010: bundle <= 14'b10_01111_000_00_00;   // SLTI
-      6'b001100: bundle <= 14'b10_01010_000_00_00;   // ANDI
-      6'b001101: bundle <= 14'b10_01110_000_00_00;   // ORI
-      6'b100011: bundle <= 14'b10_01000_000_00_01;   // LW
-      6'b101011: bundle <= 14'b00_01000_000_00_10;   // SW
-      default:   bundle <= 14'bxx_xxxxx_xxx_xx_xx;   // illegal op
+      6'b000010: bundle <= 15'b0_00_00000_001_00_00;   // J
+      6'b000011: bundle <= 15'b1_10_00000_101_00_00;   // JAL
+      6'b000100: bundle <= 15'b1_00_00001_000_01_00;   // BEQ
+      6'b000101: bundle <= 15'b1_00_00001_000_10_00;   // BNE
+      6'b001000: bundle <= 15'b1_10_01000_000_00_00;   // ADDI
+      6'b001010: bundle <= 15'b1_10_01111_000_00_00;   // SLTI
+      6'b001100: bundle <= 15'b0_10_01010_000_00_00;   // ANDI
+      6'b001101: bundle <= 15'b0_10_01110_000_00_00;   // ORI
+      6'b100011: bundle <= 15'b1_10_01000_000_00_01;   // LW
+      6'b101011: bundle <= 15'b1_00_01000_000_00_10;   // SW
+      default:   bundle <= 15'bx_xx_xxxxx_xxx_xx_xx;   // illegal op
     endcase
   end
 

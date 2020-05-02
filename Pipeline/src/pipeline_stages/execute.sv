@@ -16,7 +16,7 @@ module execute (
   input        [4:0]  rt_e_i,
   input        [4:0]  rd_e_i,
   input        [4:0]  shamt_e_i,
-  input        [31:0] sign_imm_e_i,
+  input        [31:0] ext_imm_e_i,
   input        [31:0] result_w_i,
   input        [1:0]  forward_a_e_i,
   input        [1:0]  forward_b_e_i,
@@ -59,7 +59,7 @@ module execute (
   );
   mux2       src_b_mux2 (
     .data0_i(write_data_e),
-    .data1_i(sign_imm_e_i),
+    .data1_i(ext_imm_e_i),
     .select_i(alu_src_e_i[0]),
     .result_o(src_b_e)
   );

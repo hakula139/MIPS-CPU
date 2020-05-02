@@ -13,7 +13,7 @@ module execute_reg (
   input        [4:0]  rt_d_i,
   input        [4:0]  rd_d_i,
   input        [4:0]  shamt_d_i,
-  input        [31:0] sign_imm_d_i,
+  input        [31:0] ext_imm_d_i,
   output logic [12:0] control_e_o,
   output logic [31:0] pc_plus_4_e_o,
   output logic [31:0] reg_data_1_e_o,
@@ -22,7 +22,7 @@ module execute_reg (
   output logic [4:0]  rt_e_o,
   output logic [4:0]  rd_e_o,
   output logic [4:0]  shamt_e_o,
-  output logic [31:0] sign_imm_e_o
+  output logic [31:0] ext_imm_e_o
 );
 
   flip_flop #(13) control_reg (
@@ -89,13 +89,13 @@ module execute_reg (
     .d_i(shamt_d_i),
     .q_o(shamt_e_o)
   );
-  flip_flop       sign_imm_reg (
+  flip_flop       ext_imm_reg (
     .clk_i,
     .rst_i,
     .en_ni('1),
     .clr_i(flush_e_i),
-    .d_i(sign_imm_d_i),
-    .q_o(sign_imm_e_o)
+    .d_i(ext_imm_d_i),
+    .q_o(ext_imm_e_o)
   );
 
 endmodule : execute_reg

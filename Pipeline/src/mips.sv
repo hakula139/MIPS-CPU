@@ -30,7 +30,7 @@ module mips (
   logic        mem_write_e, mem_to_reg_e;
   logic [31:0] pc_plus_4_e, reg_data_1_e, reg_data_2_e;
   logic [4:0]  rs_e, rt_e, rd_e, shamt_e, write_reg_e;
-  logic [31:0] sign_imm_e;
+  logic [31:0] ext_imm_e;
 
   logic        reg_write_m, mem_to_reg_m;
   logic [4:0]  write_reg_m;
@@ -92,7 +92,7 @@ module mips (
     .rt_e_o(rt_e),
     .rd_e_o(rd_e),
     .shamt_e_o(shamt_e),
-    .sign_imm_e_o(sign_imm_e)
+    .ext_imm_e_o(ext_imm_e)
   );
 
   execute      u_execute (
@@ -111,7 +111,7 @@ module mips (
     .rt_e_i(rt_e),
     .rd_e_i(rd_e),
     .shamt_e_i(shamt_e),
-    .sign_imm_e_i(sign_imm_e),
+    .ext_imm_e_i(ext_imm_e),
     .result_w_i(result_w),
     .forward_a_e_i(forward_a_e),
     .forward_b_e_i(forward_b_e),

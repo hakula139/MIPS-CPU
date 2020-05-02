@@ -33,10 +33,10 @@ module decode (
   output logic [4:0]  rt_e_o,
   output logic [4:0]  rd_e_o,
   output logic [4:0]  shamt_e_o,
-  output logic [31:0] sign_imm_e_o
+  output logic [31:0] ext_imm_e_o
 );
 
-  logic        equal_d, mem_to_reg_d, mem_write_d, reg_dst_d, reg_write_d;
+  logic        equal_d, mem_to_reg_d, mem_write_d, reg_dst_d, reg_write_d, sign_d;
   logic [3:0]  alu_control_d;
   logic [1:0]  alu_src_d;
   logic [12:0] control_d, control_e;
@@ -44,7 +44,7 @@ module decode (
   logic [31:0] reg_data_2_d, src_a_d, src_b_d;
 
   logic [4:0]  rd_d, shamt_d;
-  logic [31:0] sign_imm_d;
+  logic [31:0] ext_imm_d;
 
   // Control unit logic
   control_unit u_control_unit (
@@ -58,7 +58,8 @@ module decode (
     .alu_control_o(alu_control_d),
     .alu_src_o(alu_src_d),
     .reg_dst_o(reg_dst_d),
-    .reg_write_o(reg_write_d)
+    .reg_write_o(reg_write_d),
+    .sign_o(sign_d)
   );
   assign pc_src_d_o = (branch_d_o[0] & equal_d) | (branch_d_o[1] & ~equal_d);
   assign control_d  = {reg_write_d, reg_dst_d, alu_src_d, alu_control_d,
@@ -100,13 +101,14 @@ module decode (
   assign shamt_d = instr_d_i[10:6];
 
   // PC branch logic
-  sign_ext     u_sign_ext (
+  extend       u_extend (
+    .sign_i(sign_d),
     .a_i(instr_d_i[15:0]),
-    .result_o(sign_imm_d)
+    .result_o(ext_imm_d)
   );
   adder        u_adder (
     .a_i(pc_plus_4_d_i),
-    .b_i({sign_imm_d[29:0], 2'b00}),  // sign_imm_d * 4
+    .b_i({ext_imm_d[29:0], 2'b00}),  // ext_imm_d * 4
     .result_o(pc_branch_d_o)
   );
 
@@ -123,7 +125,7 @@ module decode (
     .rt_d_i(rt_d_o),
     .rd_d_i(rd_d),
     .shamt_d_i(shamt_d),
-    .sign_imm_d_i(sign_imm_d),
+    .ext_imm_d_i(ext_imm_d),
     .control_e_o(control_e),
     .pc_plus_4_e_o,
     .reg_data_1_e_o,
@@ -132,7 +134,7 @@ module decode (
     .rt_e_o,
     .rd_e_o,
     .shamt_e_o,
-    .sign_imm_e_o
+    .ext_imm_e_o
   );
   assign {reg_write_e_o, reg_dst_e_o, alu_src_e_o, alu_control_e_o,
           jump_e_o, mem_write_e_o, mem_to_reg_e_o} = control_e;
