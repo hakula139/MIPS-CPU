@@ -16,7 +16,4 @@
 // number of lines per set
 `define CACHE_E 4
 
-`define SET_NUM    2**`CACHE_S
-`define BLOCK_SIZE 2**`CACHE_B
-
 `endif
