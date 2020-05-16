@@ -91,20 +91,14 @@ module cache #(
     .read_data_o(read_data_set)
   );
 
-  assign hit = |hit_set;
+  assign hit = hit_set[index];
   assign dirty = |dirty_set;
+  assign read_data = hit ? read_data_set[index] : '0;
 
   always_comb begin
     for (int i = 0; i < SET_NUM; ++i) begin
       control_set[i] = (i == index) ? control[5:1] : '0;
     end
-    if (hit) begin
-      for (int i = 0; i < SET_NUM; ++i) begin
-				if (hit_set[i]) read_data = read_data_set[i];
-			end
-    end else begin
-			read_data = '0;
-		end
   end
 
   assign m_wen = control[0];

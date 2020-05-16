@@ -43,7 +43,7 @@ module set #(
   logic [31:0]             read_data_line[SET_SIZE-1:0];
 
   assign {write_en, set_valid, set_dirty, strategy_en, offset_sel} = control_i;
-  assign set_tag = addr_i[31:32-TAG_WIDTH];
+  assign tag = addr_i[31:32-TAG_WIDTH];
   assign offset = offset_sel ? addr_i[OFFSET_WIDTH-1:2] : mem_addr_i[OFFSET_WIDTH-1:2];
   assign write_data = offset_sel ? write_data_i : mem_read_data_i;
 
@@ -62,7 +62,7 @@ module set #(
     .write_en_i(write_en_line),
     .set_valid_i(set_valid_line),
     .set_dirty_i(set_dirty_line),
-    .set_tag_i(set_tag),
+    .set_tag_i(tag),
     .offset_i(offset),
     .write_data_i(write_data),
     .valid_o(valid_line),
