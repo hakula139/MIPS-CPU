@@ -20,7 +20,7 @@ module set #(
 ) (
   input                        clk_i,
   input                        rst_i,
-  input        [4:0]           control_i,
+  input        [5:0]           control_i,
   input        [31:0]          addr_i,
   input        [31:0]          write_data_i,
   input        [31:0]          mem_addr_i,
@@ -31,18 +31,18 @@ module set #(
   output logic [31:0]          read_data_o
 );
 
-  logic                    write_en, set_valid, set_dirty, strategy_en, offset_sel;
-  logic                    write_ok, all_valid;
+  logic                    write_en, update_en, set_valid, set_dirty, strategy_en, offset_sel;
+  logic                    all_valid;
   logic [SEL_WIDTH-1:0]    line_write, line_replace;
-  logic [SET_SIZE-1:0]     write_en_line, set_valid_line, set_dirty_line;
-  logic [TAG_WIDTH-1:0]    set_tag;
+  logic [SET_SIZE-1:0]     write_en_line, update_en_line, set_valid_line, set_dirty_line;
+  logic [TAG_WIDTH-1:0]    tag;
   logic [TAG_WIDTH-1:0]    tag_line[SET_SIZE-1:0];
   logic [OFFSET_WIDTH-3:0] offset;
   logic [31:0]             write_data;
   logic [SET_SIZE-1:0]     valid_line, dirty_line, hit_line;
   logic [31:0]             read_data_line[SET_SIZE-1:0];
 
-  assign {write_en, set_valid, set_dirty, strategy_en, offset_sel} = control_i;
+  assign {write_en, update_en, set_valid, set_dirty, strategy_en, offset_sel} = control_i;
   assign tag = addr_i[31:32-TAG_WIDTH];
   assign offset = offset_sel ? addr_i[OFFSET_WIDTH-1:2] : mem_addr_i[OFFSET_WIDTH-1:2];
   assign write_data = offset_sel ? write_data_i : mem_read_data_i;
@@ -60,6 +60,7 @@ module set #(
     .clk_i,
     .rst_i,
     .write_en_i(write_en_line),
+    .update_en_i(update_en_line),
     .set_valid_i(set_valid_line),
     .set_dirty_i(set_dirty_line),
     .set_tag_i(tag),
@@ -78,10 +79,12 @@ module set #(
 
   always_comb begin
     if (write_en) begin
-      if (!all_valid) begin
-        int ok = 0;
+      if (hit_o | ~all_valid) begin
+        int ok = 0, flag = 0;
         for (int i = 0; i < SET_SIZE; ++i) begin
-          if (!ok && !valid_line[i]) begin
+          if (hit_o) flag = hit_line[i];
+          else if (~all_valid) flag = ~valid_line[i];
+          if (!ok && flag) begin
             line_write = i;
             ok = 1;
           end else begin
@@ -92,6 +95,9 @@ module set #(
         line_write = line_replace;
       end
       write_en_line[line_write] = '1;
+    end
+    if (update_en) begin
+      update_en_line[line_write] = '1;
       set_valid_line[line_write] = set_valid;
       set_dirty_line[line_write] = set_dirty;
     end else begin

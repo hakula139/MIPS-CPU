@@ -46,10 +46,10 @@ module mips (
   logic        forward_a_d, forward_b_d;
   logic [1:0]  forward_a_e, forward_b_e;
 
-  logic        cache_miss;
+  logic        stall_cache;
 
-  assign dcen = memwrite;
-  assign cache_miss = ~(ihit & (~dcen | dhit));
+  assign dcen = memwrite | mem_to_reg_m;
+  assign stall_cache = ~(ihit & (~dcen | dhit));
 
   fetch        u_fetch (
     .clk_i(clk),
@@ -175,7 +175,7 @@ module mips (
     .reg_write_m_i(reg_write_m),
     .write_reg_w_i(write_reg_w),
     .reg_write_w_i(reg_write_w),
-    .cache_miss_i(cache_miss),
+    .stall_cache_i(stall_cache),
     .stall_f_o(stall_f),
     .stall_d_o(stall_d),
     .flush_d_o(flush_d),

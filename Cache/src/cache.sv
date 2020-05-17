@@ -51,8 +51,8 @@ module cache #(
 );
 
   logic [SET_NUM-1:0]      hit_set, dirty_set;
-  logic [5:0]              control;
-  logic [4:0]              control_set[SET_NUM-1:0];
+  logic [6:0]              control;
+  logic [5:0]              control_set[SET_NUM-1:0];
   logic [31:0]             read_data_set[SET_NUM-1:0];
   logic [TAG_WIDTH-1:0]    tag_dirty_line_set[SET_NUM-1:0];
   logic [TAG_WIDTH-1:0]    tag;
@@ -97,7 +97,7 @@ module cache #(
 
   always_comb begin
     for (int i = 0; i < SET_NUM; ++i) begin
-      control_set[i] = (i == index) ? control[5:1] : '0;
+      control_set[i] = (i == index) ? control[6:1] : '0;
     end
   end
 
