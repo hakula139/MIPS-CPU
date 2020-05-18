@@ -74,7 +74,7 @@ module set #(
   replace_controller u_replace_controller (
     .clk_i,
     .rst_i,
-    .en_i(strategy_en & hit_o),
+    .en_i(strategy_en & ~hit_o),
     .hit_line_i(hit_line),
     .out_line_o(out_line)
   );

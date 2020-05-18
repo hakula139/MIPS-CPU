@@ -67,22 +67,24 @@ module cache #(
   // Set control signals
   logic [4:0]              control_set[SET_NUM-1:0];
 
-  // Set outputs
-  logic [SET_NUM-1:0]      hit_set, dirty_set;
-  logic [TAG_WIDTH-1:0]    tag_set[SET_NUM-1:0];
-  logic [TAG_WIDTH-1:0]    tag_line;
-  logic [31:0]             read_data_set[SET_NUM-1:0];
-
-  assign hit = hit_set[index];
-  assign dirty = dirty_set[index];
-  assign tag_line = tag_set[index];
-  assign read_data = hit ? read_data_set[index] : '0;
-
   always_comb begin
     foreach (control_set[i]) begin
       control_set[i] = (i == index) ? control[5:1] : '0;
     end
   end
+
+  // Set outputs
+  logic [SET_NUM-1:0]      hit_set, dirty_set;
+  logic                    hit_cache;
+  logic [TAG_WIDTH-1:0]    tag_set[SET_NUM-1:0];
+  logic [TAG_WIDTH-1:0]    tag_line;
+  logic [31:0]             read_data_set[SET_NUM-1:0];
+
+  assign hit_cache = hit_set[index];
+  assign hit = hit_cache & input_ready;
+  assign dirty = dirty_set[index];
+  assign tag_line = tag_set[index];
+  assign read_data = hit_cache ? read_data_set[index] : '0;
 
   assign m_wen = control[0];
   assign mwrite_data = read_data;
@@ -92,7 +94,7 @@ module cache #(
     .rst_i(reset),
     .en_i(input_ready),
     .write_en_i(w_en),
-    .hit_i(hit),
+    .hit_i(hit_cache),
     .dirty_i(dirty),
     .tag_line_i(tag_line),
     .addr_i(addr),

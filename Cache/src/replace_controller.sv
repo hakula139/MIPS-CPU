@@ -16,26 +16,33 @@ module replace_controller #(
   int line_write, line_replace;
 
   always_comb begin
+    if (en_i) begin
+      int max_index = 0;
+      foreach (recent_access[i]) begin
+        if (recent_access[i] > recent_access[max_index]) begin
+          max_index = i;
+        end
+      end
+      line_replace = max_index;
+    end
+  end
+  
+  always_comb begin
     line_write = '0;
     for (int i = 0; i < SET_SIZE; ++i) begin
       if (hit_line_i[i]) line_write = i;
-      out_line_o[i] = line_replace == i;
     end
   end
 
+  assign out_line_o = 1 << line_replace;
+
   always_ff @(posedge clk_i) begin
     if (rst_i) begin
-      recent_access = '{default:'0};
+      recent_access <= '{default:'0};
     end else if (en_i) begin
-      int max_access[$], max_index[$];
-      max_access = recent_access.max();
-      max_index = max_access.find_first_index with (item == max_access.pop_front());
-      line_replace = max_index.pop_front();
       foreach (recent_access[i]) begin
-        recent_access[i] = (i == line_replace) ? 0 : recent_access[i] + 1;
+        recent_access[i] <= (i == line_replace) ? 0 : recent_access[i] + 1;
       end
-    end else begin
-      line_replace = line_write;
     end
   end
 

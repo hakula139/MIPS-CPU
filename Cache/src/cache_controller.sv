@@ -55,7 +55,7 @@ module cache_controller #(
   counter              u_counter (
     .clk_i,
     .rst_i(rst_i | wait_rst),
-    .en_i('1),
+    .en_i,
     .time_o(wait_time)
   );
 
@@ -82,14 +82,18 @@ module cache_controller #(
         `READ_MEM: begin
           wait_rst = wait_time == WAIT_TIME - 1;
           mem_addr_o = {tag, index, offset_line_o, 2'b00};
-          control_o = (wait_time == WAIT_TIME - 1) ? 6'b110000 : 6'b100000;
+          control_o = wait_rst ? 6'b110000 : 6'b100000;
         end
         default: begin
           wait_rst = ~hit_i;
           mem_addr_o = {tag, index, offset_line_o, 2'b00};
-          control_o = {{4{write_en_i}}, 2'b10};
+          control_o = {{4{hit_i & write_en_i}}, 2'b10};
         end
       endcase
+    end else begin
+      wait_rst = '0;
+      mem_addr_o = '0;
+      control_o = '0;
     end
   end
 
