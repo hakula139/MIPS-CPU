@@ -11,7 +11,6 @@ module mips (
   input        [31:0] readdata,
   input               ihit,
   input               dhit,
-  // input               cache_ready,
   output logic [31:0] pc,
   output logic        memwrite,
   output logic [31:0] aluout,
