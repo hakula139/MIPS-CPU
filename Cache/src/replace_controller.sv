@@ -6,6 +6,7 @@ module replace_controller #(
   input                       clk_i,
   input                       rst_i,
   input                       en_i,
+  input        [1:0]          mode_i,
   input        [SET_SIZE-1:0] valid_line_i,
   input        [SET_SIZE-1:0] hit_line_i,
   output logic [SET_SIZE-1:0] out_line_o
@@ -39,12 +40,20 @@ module replace_controller #(
           if (~valid_line_i[i]) line_replace = i;
         end
       end else begin
-        // Replaces the last read line
-        foreach (recent_access[i]) begin
-          if (recent_access[i] > recent_access[line_replace]) begin
-            line_replace = i;
+        case (mode_i)
+          2'b00: begin
+            // LRU, replaces the last read line
+            foreach (recent_access[i]) begin
+              if (recent_access[i] > recent_access[line_replace]) begin
+                line_replace = i;
+              end
+            end
           end
-        end
+          2'b01: begin
+            // RR, replaces random line
+            line_replace = $urandom % SET_SIZE;
+          end
+        endcase
       end
     end else begin
       line_replace = line_write;

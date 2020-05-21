@@ -16,4 +16,6 @@
 // number of lines per set
 `define CACHE_E 4
 
+`define REPLACE_MODE 0
+
 `endif
