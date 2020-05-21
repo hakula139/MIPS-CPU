@@ -11,7 +11,7 @@ module dmem (
   input        [31:0] wd,  // mem_write_data
   output logic [31:0] rd   // mem_read_data
 );
-  logic [31:0] RAM[63:0];
+  logic [31:0] RAM[127:0];
   always_ff @(posedge clk) begin
     if (we) RAM[a[31:2]] <= wd;
   end
