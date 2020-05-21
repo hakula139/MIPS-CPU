@@ -1,4 +1,5 @@
 `include "cache.svh"
+`include "replace_controller.svh"
 
 module replace_controller #(
   parameter SET_SIZE = `CACHE_E
@@ -41,7 +42,7 @@ module replace_controller #(
         end
       end else begin
         case (mode_i)
-          2'b00: begin
+          `LRU: begin
             // LRU, replaces the last read line
             foreach (recent_access[i]) begin
               if (recent_access[i] > recent_access[line_replace]) begin
@@ -49,7 +50,7 @@ module replace_controller #(
               end
             end
           end
-          2'b01: begin
+          `RR: begin
             // RR, replaces random line
             line_replace = $urandom % SET_SIZE;
           end

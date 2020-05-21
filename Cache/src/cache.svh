@@ -1,5 +1,5 @@
-`ifndef CACHE_VH
-`define CACHE_VH
+`ifndef CACHE_SVH
+`define CACHE_SVH
 
 `timescale 1ns / 1ps
 
@@ -15,7 +15,5 @@
 
 // number of lines per set
 `define CACHE_E 4
-
-`define REPLACE_MODE 0
 
 `endif

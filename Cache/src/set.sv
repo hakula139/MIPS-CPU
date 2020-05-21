@@ -1,4 +1,5 @@
 `include "cache.svh"
+`include "replace_controller.svh"
 
 /**
  * control_i       : control signals from cache_controller
