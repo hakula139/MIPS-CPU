@@ -33,7 +33,6 @@ module replace_controller #(
   assign out_line_o = 1 << line_replace;
 
   always_comb begin
-    line_replace = 0;
     if (en_i & ~hit) begin
       if (~all_valid) begin
         // Replaces an empty line
@@ -56,8 +55,6 @@ module replace_controller #(
           end
         endcase
       end
-    end else begin
-      line_replace = line_write;
     end
   end
 
