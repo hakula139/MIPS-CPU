@@ -6,6 +6,7 @@ module replace_controller #(
   input                       clk_i,
   input                       rst_i,
   input                       en_i,
+  input        [SET_SIZE-1:0] valid_line_i,
   input        [SET_SIZE-1:0] hit_line_i,
   output logic [SET_SIZE-1:0] out_line_o
 );
@@ -15,31 +16,45 @@ module replace_controller #(
   // Encoded line number
   int line_write, line_replace;
 
+  logic hit, all_valid;
+
+  assign hit = |hit_line_i;
+  assign all_valid = !(~valid_line_i);
+
   always_comb begin
-    if (en_i) begin
-      int max_index = 0;
-      foreach (recent_access[i]) begin
-        if (recent_access[i] > recent_access[max_index]) begin
-          max_index = i;
-        end
-      end
-      line_replace = max_index;
-    end
-  end
-  
-  always_comb begin
-    line_write = '0;
-    for (int i = 0; i < SET_SIZE; ++i) begin
+    line_write = 0;
+    foreach (hit_line_i[i]) begin
       if (hit_line_i[i]) line_write = i;
     end
   end
 
   assign out_line_o = 1 << line_replace;
 
+  always_comb begin
+    line_replace = 0;
+    if (en_i & ~hit) begin
+      if (~all_valid) begin
+        // Replaces an empty line
+        foreach (valid_line_i[i]) begin
+          if (~valid_line_i[i]) line_replace = i;
+        end
+      end else begin
+        // Replaces the last read line
+        foreach (recent_access[i]) begin
+          if (recent_access[i] > recent_access[line_replace]) begin
+            line_replace = i;
+          end
+        end
+      end
+    end else begin
+      line_replace = line_write;
+    end
+  end
+
   always_ff @(posedge clk_i) begin
     if (rst_i) begin
       recent_access <= '{default:'0};
-    end else if (en_i) begin
+    end else if (en_i & hit) begin
       foreach (recent_access[i]) begin
         recent_access[i] <= (i == line_replace) ? 0 : recent_access[i] + 1;
       end
