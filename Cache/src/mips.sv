@@ -11,6 +11,7 @@ module mips (
   input        [31:0] readdata,
   input               ihit,
   input               dhit,
+  // input               cache_ready,
   output logic [31:0] pc,
   output logic        memwrite,
   output logic [31:0] aluout,
@@ -49,7 +50,7 @@ module mips (
   logic        stall_cache;
 
   assign dcen = memwrite | mem_to_reg_m;
-  assign stall_cache = ~(ihit & (~dcen | dhit));
+  assign stall_cache = ~ihit | (dcen & ~dhit);
 
   fetch        u_fetch (
     .clk_i(clk),

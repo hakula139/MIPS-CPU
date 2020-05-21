@@ -32,7 +32,8 @@ module cache_controller #(
   input        [31:0]             addr_i,
   output logic [5:0]              control_o,
   output logic [31:0]             mem_addr_o,
-  output logic [OFFSET_WIDTH-3:0] offset_line_o
+  output logic [OFFSET_WIDTH-3:0] offset_line_o,
+  output logic [`STATE_WIDTH-1:0] state_o
 );
 
   localparam LINE_SIZE  = 2**(`CACHE_B - 2);
@@ -50,7 +51,6 @@ module cache_controller #(
   // FSM related
   logic [31:0]             wait_time;
   logic                    wait_rst;
-  logic [`STATE_WIDTH-1:0] state;
 
   counter              u_counter (
     .clk_i,
@@ -63,17 +63,18 @@ module cache_controller #(
     .clk_i,
     .rst_i,
     .en_i,
+    .write_en_i,
     .time_i(wait_time),
     .hit_i,
     .dirty_i,
-    .state_o(state)
+    .state_o
   );
 
   assign offset_line_o = (wait_time < LINE_SIZE) ? wait_time : LINE_SIZE - 1;
 
   always_comb begin
     if (en_i) begin
-      case (state)
+      case (state_o)
         `WRITE_BACK: begin
           wait_rst = wait_time == WAIT_TIME - 1;
           mem_addr_o = {tag_line_i, index, offset_line_o, 2'b00};
@@ -82,12 +83,12 @@ module cache_controller #(
         `READ_MEM: begin
           wait_rst = wait_time == WAIT_TIME - 1;
           mem_addr_o = {tag, index, offset_line_o, 2'b00};
-          control_o = wait_rst ? 6'b110000 : 6'b100000;
+          control_o = wait_rst ? 6'b110100 : 6'b100100;
         end
         default: begin
-          wait_rst = ~hit_i;
+          wait_rst = ~hit_i | (~write_en_i & dirty_i);
           mem_addr_o = {tag, index, offset_line_o, 2'b00};
-          control_o = {{4{hit_i & write_en_i}}, 2'b10};
+          control_o = {{3{write_en_i}}, 3'b110};
         end
       endcase
     end else begin
@@ -105,6 +106,7 @@ module cache_controller_fsm #(
   input                           clk_i,
   input                           rst_i,
   input                           en_i,
+  input                           write_en_i,
   input        [31:0]             time_i,
   input                           hit_i,
   input                           dirty_i,
@@ -120,7 +122,10 @@ module cache_controller_fsm #(
       case (state_o)
         `WRITE_BACK: if (time_i == WAIT_TIME - 1) state_o <= `READ_MEM;
         `READ_MEM: if (time_i == WAIT_TIME - 1) state_o <= `INITIAL;
-        default: if (~hit_i) state_o <= dirty_i ? `WRITE_BACK : `READ_MEM;
+        default: begin
+          if (~hit_i) state_o <= dirty_i ? `WRITE_BACK : `READ_MEM;
+          if (~write_en_i & dirty_i) state_o <= `WRITE_BACK;
+        end
       endcase
     end
   end

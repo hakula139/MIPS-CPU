@@ -1,4 +1,5 @@
 `include "cache.svh"
+`include "cache_controller.svh"
 
 /**
  * NOTE: The sum of TAG_WIDTH, SET_WIDTH and OFFSET_WIDTH should be 32
@@ -63,6 +64,10 @@ module cache #(
   // Cache controller signals
   logic [5:0]              control;
   logic [OFFSET_WIDTH-3:0] offset_line;
+  logic [`STATE_WIDTH-1:0] state;
+  logic                    default_mode;
+
+  assign default_mode = state == `INITIAL;
 
   // Set control signals
   logic [4:0]              control_set[SET_NUM-1:0];
@@ -81,7 +86,7 @@ module cache #(
   logic [31:0]             read_data_set[SET_NUM-1:0];
 
   assign hit_cache = hit_set[index];
-  assign hit = hit_cache & input_ready;
+  assign hit = hit_cache & default_mode;
   assign dirty = dirty_set[index];
   assign tag_line = tag_set[index];
   assign read_data = hit_cache ? read_data_set[index] : '0;
@@ -92,7 +97,7 @@ module cache #(
   cache_controller u_cache_controller (
     .clk_i(clk),
     .rst_i(reset),
-    .en_i(input_ready),
+    .en_i(~stall & input_ready),
     .write_en_i(w_en),
     .hit_i(hit_cache),
     .dirty_i(dirty),
@@ -100,7 +105,8 @@ module cache #(
     .addr_i(addr),
     .control_o(control),
     .mem_addr_o(maddr),
-    .offset_line_o(offset_line)
+    .offset_line_o(offset_line),
+    .state_o(state)
   );
 
   set              u_set[SET_NUM-1:0] (
