@@ -7,6 +7,7 @@ module line #(
   input                           clk_i,
   input                           rst_i,
   input                           write_en_i,
+  input                           update_en_i,
   input                           set_valid_i,
   input                           set_dirty_i,
   input        [TAG_WIDTH-1:0]    set_tag_i,
@@ -27,9 +28,13 @@ module line #(
     if (rst_i) begin
       foreach (cache_line[i]) cache_line[i] <= '0;
       {valid_o, dirty_o, tag_o} <= '0;
-    end else if (write_en_i) begin
-      cache_line[offset_i] <= write_data_i;
-      {valid_o, dirty_o, tag_o} <= {set_valid_i, set_dirty_i, set_tag_i};
+    end else begin
+      if (write_en_i) begin
+        cache_line[offset_i] <= write_data_i;
+      end
+      if (update_en_i) begin
+        {valid_o, dirty_o, tag_o} <= {set_valid_i, set_dirty_i, set_tag_i};
+      end
     end
   end
 

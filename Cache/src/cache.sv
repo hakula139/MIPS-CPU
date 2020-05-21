@@ -62,7 +62,7 @@ module cache #(
   assign offset = addr[OFFSET_WIDTH-1:2];
 
   // Cache controller signals
-  logic [5:0]              control;
+  logic [6:0]              control;
   logic [OFFSET_WIDTH-3:0] offset_line;
   logic [`STATE_WIDTH-1:0] state;
   logic                    default_mode;
@@ -70,11 +70,11 @@ module cache #(
   assign default_mode = state == `INITIAL;
 
   // Set control signals
-  logic [4:0]              control_set[SET_NUM-1:0];
+  logic [5:0]              control_set[SET_NUM-1:0];
 
   always_comb begin
     foreach (control_set[i]) begin
-      control_set[i] = (i == index) ? control[5:1] : '0;
+      control_set[i] = (i == index) ? control[6:1] : '0;
     end
   end
 

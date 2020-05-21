@@ -20,7 +20,7 @@ module set #(
 ) (
   input                        clk_i,
   input                        rst_i,
-  input        [4:0]           control_i,
+  input        [5:0]           control_i,
   input        [31:0]          addr_i,
   input        [31:0]          write_data_i,
   input        [31:0]          mem_addr_i,
@@ -34,12 +34,12 @@ module set #(
   localparam SEL_WIDTH = $clog2(SET_SIZE);
 
   // Cache controller signals
-  logic write_en, set_valid, set_dirty, strategy_en, offset_sel;
+  logic write_en, update_en, set_valid, set_dirty, strategy_en, offset_sel;
 
-  assign {write_en, set_valid, set_dirty, strategy_en, offset_sel} = control_i;
+  assign {write_en, update_en, set_valid, set_dirty, strategy_en, offset_sel} = control_i;
 
   // Line control signals
-  logic [SET_SIZE-1:0]  write_en_line;
+  logic [SET_SIZE-1:0]  write_en_line, update_en_line;
 
   // Line outputs
   logic [SET_SIZE-1:0]  valid_line, dirty_line, hit_line, out_line;
@@ -60,6 +60,7 @@ module set #(
   assign write_data = offset_sel ? write_data_i : mem_read_data_i;
   assign mask = hit_o ? hit_line : out_line;
   assign write_en_line = write_en ? mask : '0;
+  assign update_en_line = update_en ? mask : '0;
 
   always_comb begin
     {dirty_o, tag_o, read_data_o} = '0;
@@ -88,6 +89,7 @@ module set #(
     .clk_i,
     .rst_i,
     .write_en_i(write_en_line),
+    .update_en_i(update_en_line),
     .set_valid_i(set_valid),
     .set_dirty_i(set_dirty),
     .set_tag_i(set_tag),
