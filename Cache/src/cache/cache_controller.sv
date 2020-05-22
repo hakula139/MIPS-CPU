@@ -10,6 +10,7 @@
  *
  * control_o        : {write_en, update_en, set_valid, set_dirty, strategy_en, offset_sel, mem_write_en}
  * mem_addr_o       : memory address
+ * state_o          : the current state of FSM
  *
  * write_en         : writing enable signal to cache line
  * update_en        : updating enable signal to cache line (without writing)
