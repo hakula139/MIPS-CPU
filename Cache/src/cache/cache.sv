@@ -92,7 +92,7 @@ module cache #(
   assign read_data = hit_cache ? read_data_set[index] : '0;
 
   assign m_wen = control[0];
-  assign mwrite_data = read_data;
+  assign mwrite_data = read_data_set[index];
 
   cache_controller u_cache_controller (
     .clk_i(clk),
