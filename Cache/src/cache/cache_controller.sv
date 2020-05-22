@@ -90,7 +90,7 @@ module cache_controller #(
         default: begin
           wait_rst = ~hit_i | (~write_en_i & dirty_i);
           mem_addr_o = {tag, index, offset_line_o, 2'b00};
-          control_o = {{4{write_en_i}}, 3'b110};
+          control_o = {write_en_i, 1'b0, write_en_i, write_en_i, 3'b110};
         end
       endcase
     end else begin

@@ -31,9 +31,11 @@ module line #(
     end else begin
       if (write_en_i) begin
         cache_line[offset_i] <= write_data_i;
+        dirty_o <= '1;
       end
       if (update_en_i) begin
-        {valid_o, dirty_o, tag_o} <= {set_valid_i, set_dirty_i, set_tag_i};
+        {valid_o, dirty_o} <= {set_valid_i, set_dirty_i};
+        if (write_en_i) tag_o <= set_tag_i;
       end
     end
   end
