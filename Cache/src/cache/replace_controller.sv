@@ -4,16 +4,17 @@
 module replace_controller #(
   parameter SET_SIZE = `CACHE_E
 ) (
-  input                       clk_i,
-  input                       rst_i,
-  input                       en_i,
-  input        [1:0]          mode_i,
-  input        [SET_SIZE-1:0] valid_line_i,
-  input        [SET_SIZE-1:0] hit_line_i,
-  output logic [SET_SIZE-1:0] out_line_o
+  input                          clk_i,
+  input                          rst_i,
+  input                          en_i,
+  input        [`MODE_WIDTH-1:0] mode_i,
+  input        [SET_SIZE-1:0]    valid_line_i,
+  input        [SET_SIZE-1:0]    hit_line_i,
+  output logic [SET_SIZE-1:0]    out_line_o
 );
 
   int recent_access[SET_SIZE-1:0];
+  int access_count[SET_SIZE-1:0];
 
   // Encoded line number
   int line_write, line_replace;
@@ -42,7 +43,7 @@ module replace_controller #(
       end else begin
         case (mode_i)
           `LRU: begin
-            // LRU, replaces the last read line
+            // LRU, replaces the least recently used line
             foreach (recent_access[i]) begin
               if (recent_access[i] > recent_access[line_replace]) begin
                 line_replace = i;
@@ -53,6 +54,14 @@ module replace_controller #(
             // RR, replaces random line
             line_replace = $urandom % SET_SIZE;
           end
+          `LFU: begin
+            // LFU, replaces the least frequently used line
+            foreach (access_count[i]) begin
+              if (access_count[i] < access_count[line_replace]) begin
+                line_replace = i;
+              end
+            end
+          end
         endcase
       end
     end
@@ -61,10 +70,21 @@ module replace_controller #(
   always_ff @(posedge clk_i) begin
     if (rst_i) begin
       recent_access <= '{default:'0};
+      access_count <= '{default:'0};
     end else if (en_i & hit) begin
-      foreach (recent_access[i]) begin
-        recent_access[i] <= (i == line_replace) ? 0 : recent_access[i] + 1;
-      end
+      case (mode_i)
+        `LRU: begin
+          foreach (recent_access[i]) begin
+            recent_access[i] <= (i == line_replace) ? 0 : recent_access[i] + 1;
+          end
+        end
+        `RR: begin
+          // Does nothing
+        end
+        `LFU: begin
+          access_count[line_replace] <= access_count[line_replace] + 1;
+        end
+      endcase
     end
   end
 

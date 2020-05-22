@@ -51,7 +51,7 @@ module set #(
   logic [OFFSET_WIDTH-3:0] offset;
   logic [31:0]             write_data;
   logic [SET_SIZE-1:0]     mask;
-  logic [1:0]              replace_mode;
+  logic [`MODE_WIDTH-1:0]  replace_mode;
 
   assign hit_o = |hit_line;
 
