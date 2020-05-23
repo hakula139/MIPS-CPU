@@ -31,8 +31,6 @@ module set #(
   output logic [31:0]          read_data_o
 );
 
-  localparam SEL_WIDTH = $clog2(SET_SIZE);
-
   // Cache controller signals
   logic write_en, update_en, set_valid, set_dirty, strategy_en, offset_sel;
 

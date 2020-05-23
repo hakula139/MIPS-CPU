@@ -52,7 +52,7 @@ module replace_controller #(
           end
           `RR: begin
             // RR, replaces random line
-            line_replace = $urandom % SET_SIZE;
+            line_replace = $urandom(233) % SET_SIZE;
           end
           `LFU: begin
             // LFU, replaces the least frequently used line
