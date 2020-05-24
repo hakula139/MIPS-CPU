@@ -42,7 +42,7 @@ Cache Controller 通过一个有限状态机（FSM, Finite State Machine）来�
 
 代码见[这里](./src/cache/cache_controller.sv)。
 
-### 2.2.1 FSM
+#### 2.2.1 FSM
 
 ![FSM](./assets/fsm.svg)
 
@@ -58,7 +58,7 @@ Cache Controller 通过一个有限状态机（FSM, Finite State Machine）来�
 - `READ_MEM`：读内存状态，从内存读取数据到缓存
   - 阻塞 Cache 到读入完成后（`ready` 为 `1`）切换到 `INITIAL` 状态，默认需要等待 4 个时钟周期
 
-### 2.2.2 Controller Logic
+#### 2.2.2 Controller Logic
 
 根据 FSM 提供的当前状态，Cache Controller 输出 Set / 内存的控制信号，如下所示：
 
@@ -82,13 +82,13 @@ Cache Controller 通过一个有限状态机（FSM, Finite State Machine）来�
 - `offset_sel` 为 `1` 时，Cache 与 CPU 交互，访问 Line 的块偏移量（block offset）由 CPU 输入的地址提供，写入 Line 的数据（如果需要）为 CPU 输入的数据；`offset_sel` 为 `0` 时，Cache 与内存交互，访问 Line 的块偏移量由当前访问的内存地址提供，写入 Line 的数据为从内存读取的数据
 - `mem_write_en` 即是否对内存进行写操作
 
-## 2.3 Set
+### 2.3 Set
 
 得到控制信号的 Set 需要判断读写及返回哪一个 Line 的数据。本实现中，每个 Line 自行检查 tag 是否匹配，并返回是否命中，命中的 Line 将同时返回对应块的数据。如果存在命中的 Line，Set 就返回这个 Line 的数据，否则交由 Replace Controller 决定接下来应当写入（覆盖）哪一个 Line。
 
 代码见[这里](./src/cache/set.sv)。
 
-## 2.4 Replace Controller
+### 2.4 Replace Controller
 
 Replace Controller 根据当前各 Line 的 valid 和 hit 情况决定并输出接下来应当替换的 Line。当 `strategy_en` 为 `1` 时启用，否则 Replace Controller 将保持之前的输出。
 
