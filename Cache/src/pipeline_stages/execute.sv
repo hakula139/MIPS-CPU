@@ -20,7 +20,6 @@ module execute (
   input        [31:0] result_w_i,
   input        [1:0]  forward_a_e_i,
   input        [1:0]  forward_b_e_i,
-  input               stall_m_i,
   output logic [4:0]  write_reg_e_o,
   output logic        reg_write_m_o,
   output logic        mem_write_m_o,
@@ -92,7 +91,6 @@ module execute (
   memory_reg u_memory_reg (
     .clk_i,
     .rst_i,
-    .stall_m_i,
     .control_e_i(control_e),
     .alu_out_e_i(write_reg_data_e),
     .write_data_e_i(write_data_e),

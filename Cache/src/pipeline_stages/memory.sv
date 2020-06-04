@@ -8,7 +8,6 @@ module memory (
   input        [31:0] alu_out_m_i,
   input        [4:0]  write_reg_m_i,
   input        [31:0] read_data_m_i,
-  input               stall_w_i,
   output logic        reg_write_w_o,
   output logic        mem_to_reg_w_o,
   output logic [31:0] alu_out_w_o,
@@ -23,7 +22,6 @@ module memory (
   writeback_reg u_writeback_reg (
     .clk_i,
     .rst_i,
-    .stall_w_i,
     .control_m_i(control_m),
     .alu_out_m_i,
     .read_data_m_i,

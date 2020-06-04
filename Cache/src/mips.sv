@@ -42,14 +42,11 @@ module mips (
   logic [31:0] read_data_w, alu_out_w, result_w;
   logic [4:0]  write_reg_w;
 
-  logic        stall_f, stall_d, flush_d, stall_e, flush_e, stall_m, stall_w;
+  logic        stall_f, stall_d, flush_d, flush_e;
   logic        forward_a_d, forward_b_d;
   logic [1:0]  forward_a_e, forward_b_e;
 
-  logic        stall_cache;
-
   assign dcen = memwrite | mem_to_reg_m;
-  assign stall_cache = ~ihit | (dcen & ~dhit);
 
   fetch        u_fetch (
     .clk_i(clk),
@@ -78,7 +75,6 @@ module mips (
     .result_w_i(result_w),
     .forward_a_d_i(forward_a_d),
     .forward_b_d_i(forward_b_d),
-    .stall_e_i(stall_e),
     .flush_e_i(flush_e),
     .branch_d_o(branch_d),
     .pc_src_d_o(pc_src_d),
@@ -124,7 +120,6 @@ module mips (
     .result_w_i(result_w),
     .forward_a_e_i(forward_a_e),
     .forward_b_e_i(forward_b_e),
-    .stall_m_i(stall_m),
     .write_reg_e_o(write_reg_e),
     .reg_write_m_o(reg_write_m),
     .mem_write_m_o(memwrite),
@@ -142,7 +137,6 @@ module mips (
     .alu_out_m_i(aluout),
     .write_reg_m_i(write_reg_m),
     .read_data_m_i(readdata),
-    .stall_w_i(stall_w),
     .reg_write_w_o(reg_write_w),
     .mem_to_reg_w_o(mem_to_reg_w),
     .alu_out_w_o(alu_out_w),
@@ -175,18 +169,14 @@ module mips (
     .reg_write_m_i(reg_write_m),
     .write_reg_w_i(write_reg_w),
     .reg_write_w_i(reg_write_w),
-    .stall_cache_i(stall_cache),
     .stall_f_o(stall_f),
     .stall_d_o(stall_d),
     .flush_d_o(flush_d),
     .forward_a_d_o(forward_a_d),
     .forward_b_d_o(forward_b_d),
-    .stall_e_o(stall_e),
     .flush_e_o(flush_e),
     .forward_a_e_o(forward_a_e),
-    .forward_b_e_o(forward_b_e),
-    .stall_m_o(stall_m),
-    .stall_w_o(stall_w)
+    .forward_b_e_o(forward_b_e)
   );
 
 endmodule : mips

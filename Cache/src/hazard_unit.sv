@@ -17,18 +17,14 @@ module hazard_unit (
   input              reg_write_m_i,
   input        [4:0] write_reg_w_i,
   input              reg_write_w_i,
-  input              stall_cache_i,
   output logic       stall_f_o,
   output logic       stall_d_o,
   output logic       flush_d_o,
   output logic       forward_a_d_o,
   output logic       forward_b_d_o,
-  output logic       stall_e_o,
   output logic       flush_e_o,
   output logic [1:0] forward_a_e_o,
-  output logic [1:0] forward_b_e_o,
-  output logic       stall_m_o,
-  output logic       stall_w_o
+  output logic [1:0] forward_b_e_o
 );
 
   logic lw_stall, branch_stall;
@@ -63,13 +59,9 @@ module hazard_unit (
       && (reg_write_e_i && (rs_d_i == write_reg_e_i || rt_d_i == write_reg_e_i)
       || mem_to_reg_m_i && (rs_d_i == write_reg_m_i || rt_d_i == write_reg_m_i));
 
-  assign stall_w_o = stall_cache_i;
-  assign stall_m_o = stall_w_o;
-  assign stall_e_o = stall_m_o;
-  assign stall_d_o = lw_stall || branch_stall || stall_e_o;
-  assign stall_f_o = stall_d_o;
-
+  assign stall_d_o = lw_stall || branch_stall;
   assign flush_e_o = stall_d_o;
   assign flush_d_o = pc_src_d_i || jump_d_i;
+  assign stall_f_o = stall_d_o;
 
 endmodule : hazard_unit

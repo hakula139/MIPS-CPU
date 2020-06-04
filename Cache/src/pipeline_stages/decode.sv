@@ -11,7 +11,6 @@ module decode (
   input        [31:0] result_w_i,
   input               forward_a_d_i,
   input               forward_b_d_i,
-  input               stall_e_i,
   input               flush_e_i,
   output logic [1:0]  branch_d_o,
   output logic        pc_src_d_o,
@@ -117,7 +116,6 @@ module decode (
   execute_reg  u_execute_reg (
     .clk_i,
     .rst_i,
-    .stall_e_i,
     .flush_e_i,
     .control_d_i(control_d),
     .pc_plus_4_d_i,
