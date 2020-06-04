@@ -30,11 +30,11 @@ module mux4 #(
 );
   always_comb begin
     unique case (select_i)
-      2'b00:   result_o <= data0_i;
-      2'b01:   result_o <= data1_i;
-      2'b10:   result_o <= data2_i;
-      2'b11:   result_o <= data3_i;
-      default: result_o <= '0;
+      2'b00:   result_o = data0_i;
+      2'b01:   result_o = data1_i;
+      2'b10:   result_o = data2_i;
+      2'b11:   result_o = data3_i;
+      default: result_o = '0;
     endcase
   end
 endmodule : mux4

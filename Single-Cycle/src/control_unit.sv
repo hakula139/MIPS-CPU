@@ -62,22 +62,22 @@ module main_dec (
     unique case (op_i)
       6'b000000: begin
         unique casez (funct_i)
-          6'b0000??: bundle <= 14'b11_10100_000_00_00;  // SLL, SRL, SRA
-          6'b001000: bundle <= 14'b0x_xxxxx_010_xx_0x;  // JR
-          default:   bundle <= 14'b11_00100_000_00_00;  // R-type
+          6'b0000??: bundle = 14'b11_10100_000_00_00;  // SLL, SRL, SRA
+          6'b001000: bundle = 14'b0x_xxxxx_010_xx_0x;  // JR
+          default:   bundle = 14'b11_00100_000_00_00;  // R-type
         endcase
       end
-      6'b000010: bundle <= 14'b0x_xxxxx_001_xx_0x;   // J
-      6'b000011: bundle <= 14'b10_xxxxx_101_xx_0x;   // JAL
-      6'b000100: bundle <= 14'b0x_00001_000_01_0x;   // BEQ
-      6'b000101: bundle <= 14'b0x_00001_000_10_0x;   // BNE
-      6'b001000: bundle <= 14'b10_01000_000_00_00;   // ADDI
-      6'b001010: bundle <= 14'b10_01111_000_00_00;   // SLTI
-      6'b001100: bundle <= 14'b10_01010_000_00_00;   // ANDI
-      6'b001101: bundle <= 14'b10_01110_000_00_00;   // ORI
-      6'b100011: bundle <= 14'b10_01000_000_00_01;   // LW
-      6'b101011: bundle <= 14'b0x_01000_000_00_1x;   // SW
-      default:   bundle <= 14'bxx_xxxxx_xxx_xx_xx;   // illegal op
+      6'b000010: bundle = 14'b0x_xxxxx_001_xx_0x;   // J
+      6'b000011: bundle = 14'b10_xxxxx_101_xx_0x;   // JAL
+      6'b000100: bundle = 14'b0x_00001_000_01_0x;   // BEQ
+      6'b000101: bundle = 14'b0x_00001_000_10_0x;   // BNE
+      6'b001000: bundle = 14'b10_01000_000_00_00;   // ADDI
+      6'b001010: bundle = 14'b10_01111_000_00_00;   // SLTI
+      6'b001100: bundle = 14'b10_01010_000_00_00;   // ANDI
+      6'b001101: bundle = 14'b10_01110_000_00_00;   // ORI
+      6'b100011: bundle = 14'b10_01000_000_00_01;   // LW
+      6'b101011: bundle = 14'b0x_01000_000_00_1x;   // SW
+      default:   bundle = 14'bxx_xxxxx_xxx_xx_xx;   // illegal op
     endcase
   end
 
@@ -92,22 +92,22 @@ module alu_dec (
 
   always_comb begin
     unique case (alu_op_i)
-      3'b000: alu_control_o <= 4'd2;  // ADD (for ADDI, LW, SW)
-      3'b001: alu_control_o <= 4'd6;  // SUB (for BEQ, BNE)
-      3'b010: alu_control_o <= 4'd0;  // AND (for ANDI)
-      3'b110: alu_control_o <= 4'd1;  // OR  (for ORI)
-      3'b111: alu_control_o <= 4'd7;  // SLT (for SLTI)
+      3'b000: alu_control_o = 4'd2;  // ADD (for ADDI, LW, SW)
+      3'b001: alu_control_o = 4'd6;  // SUB (for BEQ, BNE)
+      3'b010: alu_control_o = 4'd0;  // AND (for ANDI)
+      3'b110: alu_control_o = 4'd1;  // OR  (for ORI)
+      3'b111: alu_control_o = 4'd7;  // SLT (for SLTI)
       default: begin                  // R-type
         unique case (funct_i)
-          6'b000000: alu_control_o <= 4'd3;  // SLL
-          6'b000010: alu_control_o <= 4'd8;  // SRL
-          6'b000011: alu_control_o <= 4'd9;  // SRA
-          6'b100000: alu_control_o <= 4'd2;  // ADD
-          6'b100010: alu_control_o <= 4'd6;  // SUB
-          6'b100100: alu_control_o <= 4'd0;  // AND
-          6'b100101: alu_control_o <= 4'd1;  // OR
-          6'b101010: alu_control_o <= 4'd7;  // SLT
-          default:   alu_control_o <= 4'dx;  // illegal funct
+          6'b000000: alu_control_o = 4'd3;  // SLL
+          6'b000010: alu_control_o = 4'd8;  // SRL
+          6'b000011: alu_control_o = 4'd9;  // SRA
+          6'b100000: alu_control_o = 4'd2;  // ADD
+          6'b100010: alu_control_o = 4'd6;  // SUB
+          6'b100100: alu_control_o = 4'd0;  // AND
+          6'b100101: alu_control_o = 4'd1;  // OR
+          6'b101010: alu_control_o = 4'd7;  // SLT
+          default:   alu_control_o = 4'dx;  // illegal funct
         endcase
       end
     endcase

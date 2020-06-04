@@ -32,18 +32,18 @@ module hazard_unit (
   // Solves data hazards with forwarding
   always_comb begin
     if (rs_e_i && rs_e_i == write_reg_m_i && reg_write_m_i) begin
-      forward_a_e_o <= 2'b10;
+      forward_a_e_o = 2'b10;
     end else if (rs_e_i && rs_e_i == write_reg_w_i && reg_write_w_i) begin
-      forward_a_e_o <= 2'b01;
+      forward_a_e_o = 2'b01;
     end else begin
-      forward_a_e_o <= 2'b00;
+      forward_a_e_o = 2'b00;
     end
     if (rt_e_i && rt_e_i == write_reg_m_i && reg_write_m_i) begin
-      forward_b_e_o <= 2'b10;
+      forward_b_e_o = 2'b10;
     end else if (rt_e_i && rt_e_i == write_reg_w_i && reg_write_w_i) begin
-      forward_b_e_o <= 2'b01;
+      forward_b_e_o = 2'b01;
     end else begin
-      forward_b_e_o <= 2'b00;
+      forward_b_e_o = 2'b00;
     end
   end
 

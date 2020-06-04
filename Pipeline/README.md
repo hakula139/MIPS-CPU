@@ -229,11 +229,11 @@ Writeback 阶段，由 `mem_to_reg` 信号控制 result_mux2 选择写入 reg_fi
 
 ```verilog {.line-numbers}
 if (rs_e_i && rs_e_i == write_reg_m_i && reg_write_m_i) begin
-  forward_a_e_o <= 2'b10;
+  forward_a_e_o = 2'b10;
 end else if (rs_e_i && rs_e_i == write_reg_w_i && reg_write_w_i) begin
-  forward_a_e_o <= 2'b01;
+  forward_a_e_o = 2'b01;
 end else begin
-  forward_a_e_o <= 2'b00;
+  forward_a_e_o = 2'b00;
 end
 ```
 

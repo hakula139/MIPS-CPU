@@ -120,7 +120,7 @@ assign {reg_write_o, reg_dst_o, alu_src_o, alu_op_o,
 
 always_comb begin
   unique case (op_i)
-    6'b001000: bundle <= 14'b10_01000_000_00_00;   // ADDI
+    6'b001000: bundle = 14'b10_01000_000_00_00;   // ADDI
     // ...
   endcase
 end
