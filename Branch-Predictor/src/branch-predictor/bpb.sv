@@ -2,7 +2,7 @@
 
 /**
  * ENTRIES         : number of entries in the branch predictor buffer
- * TAG_WIDTH       : index bits
+ * INDEX_WIDTH     : index bits
  * instr_addr_i    : if this address has been recorded, then CPU can go as the BPB directs
  * is_branch_i     : in order to register the branch when first meeted
  * real_taken_i    : whether this branch should be taken according to the semantics of the instructions
@@ -11,8 +11,8 @@
  * predict_addr_o  : where should this branch jumps to if it's taken
  */
 module bpb #(
-  parameter ENTRIES   = `BPB_E,
-  parameter TAG_WIDTH = `BPB_T
+  parameter ENTRIES     = `BPB_E,
+  parameter INDEX_WIDTH = `BPB_T
 ) (
   input               clk_i,
   input               rst_i,
