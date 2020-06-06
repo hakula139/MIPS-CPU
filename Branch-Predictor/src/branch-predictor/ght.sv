@@ -1,29 +1,29 @@
 `timescale 1ns / 1ps
 
-// Global History Tracker (Global Predictor)
+// Global History Tracker
 module ght (
   input              clk_i,
   input              rst_i,
   input              en_i,
   input              update_en_i,
   input              last_taken_i,
-  output logic [1:0] taken_o
+  output logic [1:0] state_o
 );
 
-  logic [1:0] last_data;
+  logic [1:0] last_state;
 
   state_switch u_state_switch (
     .last_taken_i,
-    .prev_data_i(last_data),
-    .next_data_o(taken_o)
+    .prev_state_i(last_state),
+    .next_state_o(state_o)
   );
 
   always_ff @(posedge clk_i or posedge rst_i) begin
     if (rst_i) begin
-      taken_o <= '0;
-      last_data <= '0;
+      state_o <= '0;
+      last_state <= '0;
     end else if (en_i & update_en_i) begin
-      last_data <= taken_o;
+      last_state <= state_o;
     end
   end
 
