@@ -11,7 +11,7 @@ module pht #(
   input                          is_branch_i,
   input        [INDEX_WIDTH-1:0] index_i,
   // Decode stage
-  input                          is_correct_i,
+  input                          update_en_i,
   input                          last_taken_i,
   // Prediction & Fallback
   input                          fallback_i,
@@ -44,7 +44,7 @@ module pht #(
         entries[index_i] <= fallback_i;
         valid[index_i] <= 1'b1;
       end
-      if (~is_correct_i) begin
+      if (update_en_i) begin
         entries[last_index] <= entry;
       end
       last_index <= index_i;
