@@ -30,11 +30,11 @@ module pht #(
 
   state_switch u_state_switch (
     .last_taken_i,
-    .prev_entry_i(entries[last_index]),
-    .next_entry_o(entry)
+    .prev_state_i(entries[last_index]),
+    .next_state_o(entry)
   );
   
-  always_ff @(posedge clk_i or posedge rst_i) begin
+  always_ff @(posedge clk_i) begin
     if (rst_i) begin
       entries <= '{default:'0};
       valid <= '0;

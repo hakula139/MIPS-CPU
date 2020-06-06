@@ -8,7 +8,7 @@
  * pc_f_i          : address from Fetch stage; if this address has been cached, then CPU goes to where the BPB directs
  * instr_f_i       : instruction from Fetch stage
  * real_taken_i    : whether this branch should be taken according to the semantics of the instructions
- * pc_d_i          : address from Decode stage; check if the prediction was correct
+ * pc_d_i          : the real next address from Decode stage
  * instr_d_i       : instruction from Decode stage
  * predict_pc_o    : where should this branch jumps to if it's taken
  */
@@ -30,7 +30,8 @@ module bpb #(
   input        [31:0] pc_d_i,
   input        [31:0] instr_d_i,
   // Prediction
-  output logic [31:0] predict_pc_o
+  output logic [31:0] predict_pc_o,
+  output              miss_o
 );
 
   logic [31:0] pc_plus_4, pc_next;
@@ -77,11 +78,11 @@ module bpb #(
     .state_o(bht_state)
   );
 
-  logic static_taken, global_taken, local_taken, fallback, mux;
-  logic last_taken, last_mux, miss;
+  logic static_taken, global_taken, local_taken, fallback, mux, mux_taken;
+  logic last_taken, last_mux;
   logic last_conflict;
 
-  assign miss = last_taken != real_taken_i;
+  assign miss_o = last_taken != real_taken_i;
 
   // Static Predictor as a fallback
   static_predictor u_static_predictor (
@@ -121,9 +122,9 @@ module bpb #(
     .is_branch_i(is_branch_f),
     .index_i(index),
     .update_en_i(is_branch_d & last_conflict),
-    .last_taken_i(last_mux ^ miss),
+    .last_taken_i(last_mux ^ miss_o),
     .fallback_i(FALLBACK_MODE == `USE_GLOBAL),
-    .taken_o(mux)
+    .taken_o(mux_taken)
   );
 
   logic predict_taken;
@@ -134,12 +135,12 @@ module bpb #(
       `USE_STATIC: {predict_taken, mux} = {static_taken, 1'b0};
       `USE_GLOBAL: {predict_taken, mux} = {global_taken, 1'b1};
       `USE_LOCAL:  {predict_taken, mux} = {local_taken, 1'b0};
-      default:     predict_taken = mux ? global_taken : local_taken;
+      default:     {predict_taken, mux} = {mux_taken ? global_taken : local_taken, mux_taken};
     endcase
     predict_pc_o = predict_taken ? pc_next : pc_plus_4;
   end
 
-  always_ff @(posedge clk_i or posedge rst_i) begin
+  always_ff @(posedge clk_i) begin
     if (rst_i) begin
       {last_taken, last_mux, last_conflict} <= '0;
     end else if (en_i) begin

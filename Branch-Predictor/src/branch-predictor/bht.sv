@@ -26,7 +26,7 @@ module bht #(
     .next_state_o(entry)
   );
 
-  always_ff @(posedge clk_i or posedge rst_i) begin
+  always_ff @(posedge clk_i) begin
     if (rst_i) begin
       entries <= '{default:'0};
       last_index <= '0;

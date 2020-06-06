@@ -18,9 +18,8 @@ module ght (
     .next_state_o(state_o)
   );
 
-  always_ff @(posedge clk_i or posedge rst_i) begin
+  always_ff @(posedge clk_i) begin
     if (rst_i) begin
-      state_o <= '0;
       last_state <= '0;
     end else if (en_i & update_en_i) begin
       last_state <= state_o;
