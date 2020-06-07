@@ -79,7 +79,7 @@ Tournament Predictor 的优势在于能够根据不同分支的不同情况，�
 
 ### 2.6 BPB (Branch Prediction Buffer)
 
-BPB 也就是这个动态分支预测器的主体，负责与 CPU 的 Fetch 和 Decode 阶段交互。
+BPB 也就是这个动态分支预测器的主体，负责预测跳转地址并与 CPU 交互。
 
 实现中，BPB 先获得 Fetch 阶段的指令及其地址，通过 [Parser](./src/branch-predictor/parser.sv) 进行解析，得到一些在 Fetch 阶段就能知道的信息（如指令类型、跳转目标地址等）。目前能够很好地处理 j, jal, beq, bne 指令，但无法处理 jr 指令，因为需要寄存器的数据。为方便起见，还是把 jr 指令留给 Decode 阶段，否则需要处理新增的数据冲突和控制冲突。还有一个思路是先预读寄存器内的数据（可能有错误），等到 Decode 阶段发现寄存器内的数据有误时直接 flush 流水线，这样可以不用处理冲突，同时很多情况下可以减少 jr 指令的 CPI。由于时间问题，这里并没有尝试实现。
 
@@ -89,9 +89,16 @@ BPB 也就是这个动态分支预测器的主体，负责与 CPU 的 Fetch 和 
 
 ## 3. 一些改动
 
-本分支预测器的实现基于之前实现的 Pipeline MIPS CPU with Cache，这里注明所作的一些改动。
+本动态分支预测器的实现基于之前实现的 Pipeline MIPS CPU with Cache，这里注明所作的一些改动。
 
-TODO
+首先在 mips 里增加了 BPB 模块，并且增加了其与 Fetch 阶段和 Hazard Unit 的交互。Fetch 阶段更改了 `pc_next`（新的 PC 值）的选择逻辑，当预测失败或当前指令为 jr 时选择原本的 `pc_next` 值，否则选择 BPB 的预测值 `predict_pc`。这里 BPB 同时可以预测非跳转指令的 `pc_next` 值（也就是 `pc + 4`），因此这里就一并交给 BPB 处理了，其中 jr 指令是 BPB 无法处理的例外情况。
+
+此外，根据 2.6 节的描述，修改了 hazard_unit 的 `flush_d` 信号。由于现在采用动态分支预测，跳转指令在 Fetch 阶段后就会直接跳转，而不像原来要再读取一条无用指令，因此不需要针对跳转指令进行额外的 flush 操作（jr 指令除外）。实际上这个 penalty 是转移到了预测失败时的情况，但现在预测成功时就没有这个 penalty 了，动态分支预测主要就是优化了这个地方。
+
+```verilog {.line-numbers}
+assign flush_e_o = stall_d_o || predict_miss_i;
+assign flush_d_o = predict_miss_i || jump_d_i[1];  // wrong prediction or JR
+```
 
 ## 4. 样例测试
 
@@ -110,7 +117,38 @@ TODO
 
 ### 4.3 测试分析
 
-TODO
+同等条件下，未使用动态分支预测时 CPI 为 `1.997842`。可见，动态分支预测将 CPI 降低了 `0.2` 左右，优化效果还是比较可观的。以下调整不同参数，进行了一些测试。
+
+Tournament Predictor miss 时优先选择哪种预测模式：
+
+| Mode   | CPI      |
+|:------:|:--------:|
+| Local  | 1.794349 |
+| Global | 1.794741 |
+
+似乎 Local Predictor 在冷启动阶段的短时间内表现稍好一点。
+
+BPB 默认使用哪种预测模式：
+
+| Mode   | CPI      |
+|:------:|:--------:|
+| Both   | 1.794741 |
+| Local  | 1.794937 |
+| Global | 1.794152 |
+| Static | 1.849294 |
+| None   | 1.997842 |
+
+可见动态分支预测显著优于静态分支预测。但为什么 Tournament Predictor 表现没有只使用 Global Predictor 时好？可能原因是测试样例整体都偏向于 Global Predictor 侧，而 Tournament Predictor 在开始阶段则需要调整预测模式的选择，这需要一定的调整时间，因此在这段时间内其表现自然就不如 Global Predictor。如果个别测试样例对 Local Predictor 和 Global Predictor 分别有明显偏好，但整体而言并没有明显偏向性，此时 Tournament Predictor 应该会有较好发挥。
+
+Static Predictor 采用哪种策略：
+
+| Policy    | CPI      |
+|:---------:|:--------:|
+| Not taken | 1.990190 |
+| Taken     | 1.793962 |
+| BTFNT     | 1.849294 |
+
+对于静态分支预测，预测效果 Taken > BTFNT > Not taken，比较意外。通常来说应该是 BTFNT 的效果较优，可能比较依赖于测试样例的具体构造。
 
 ## 5. 贡献者
 
