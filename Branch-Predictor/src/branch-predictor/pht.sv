@@ -41,7 +41,7 @@ module pht #(
       last_index <= '0;
     end else if (en_i) begin
       if (is_branch_i & ~hit) begin
-        entries[index_i] <= fallback_i;
+        entries[index_i] <= {1'b1, fallback_i};
         valid[index_i] <= 1'b1;
       end
       if (update_en_i) begin
