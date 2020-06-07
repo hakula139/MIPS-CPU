@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-// Global History Tracker
+// Global History Table
 module ght (
   input              clk_i,
   input              rst_i,

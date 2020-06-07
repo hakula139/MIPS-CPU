@@ -11,9 +11,9 @@
 `define USE_STATIC    0  // uses Static Predictor
 `define USE_GLOBAL    1  // uses Global Predictor
 `define USE_LOCAL     2  // uses Local Predictor
-`define USE_TWO_LEVEL 3  // uses Two-Level Predictor (Global and Local)
+`define USE_BOTH      3  // uses Tournament Predictor (both Global and Local)
 
-`define MODE              `USE_TWO_LEVEL
+`define MODE              `USE_BOTH
 `define PHT_FALLBACK_MODE `USE_GLOBAL
 
 `endif

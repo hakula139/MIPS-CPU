@@ -57,7 +57,7 @@ module bpb #(
   assign index = pc_f_i[INDEX_WIDTH+1:2];  // word aligned
   assign real_taken = last_taken_o ^ miss_i;
 
-  // Global History Tracker
+  // Global History Table
   ght              u_ght (
     .clk_i,
     .rst_i,
@@ -66,7 +66,7 @@ module bpb #(
     .last_taken_i(real_taken),
     .state_o(ght_state)
   );
-  // Branch History Tracker
+  // Branch History Table
   bht              u_bht (
     .clk_i,
     .rst_i,

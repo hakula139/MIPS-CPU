@@ -1,6 +1,6 @@
 `include "bpb.svh"
 
-// Branch History Tracker
+// Branch History Table
 module bht #(
   parameter SIZE_WIDTH  = `BPB_E,
   parameter INDEX_WIDTH = `BPB_T
