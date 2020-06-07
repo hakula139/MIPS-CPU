@@ -21,10 +21,10 @@
 
 在 [replace_controller.svh](./src/cache/replace_controller.svh) 中可调节以下参数：
 
-- `REPLACE_MODE`：当前缓存替换策略 $mode$，目前实现了以下策略：
-  - LRU：Least Recently Used，$mode = 0$
-  - RR：Random Replacement，$mode = 1$
-  - LFU：Least Frequently Used, $mode = 2$
+- `REPLACE_MODE`：当前缓存替换策略 $\text{mode}$，目前实现了以下策略：
+  - LRU：Least Recently Used，$\text{mode} = 0$
+  - RR：Random Replacement，$\text{mode} = 1$
+  - LFU：Least Frequently Used, $\text{mode} = 2$
 
 ## 2. 结构
 
