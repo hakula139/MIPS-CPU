@@ -50,7 +50,7 @@ module fetch (
   mux2       real_pc_next_mux2 (
     .data0_i(predict_pc_i),
     .data1_i(pc_next_f),
-    .select_i(predict_miss_i),
+    .select_i(predict_miss_i | jump_d_i[1]),  // wrong prediction or JR
     .result_o(real_pc_next_f)
   );
 

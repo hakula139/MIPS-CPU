@@ -62,7 +62,7 @@ module hazard_unit (
 
   assign stall_d_o = lw_stall || branch_stall;
   assign flush_e_o = stall_d_o || predict_miss_i;
-  assign flush_d_o = predict_miss_i;
+  assign flush_d_o = predict_miss_i || jump_d_i[1];  // wrong prediction or JR
   assign stall_f_o = stall_d_o;
 
 endmodule : hazard_unit
