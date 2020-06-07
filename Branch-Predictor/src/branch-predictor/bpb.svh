@@ -4,7 +4,7 @@
 `timescale 1ns / 1ps
 
 // number of entries
-`define BPB_E 8
+`define BPB_E 10
 // index bits
 `define BPB_T 10
 
