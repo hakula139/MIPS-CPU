@@ -18,8 +18,9 @@ module mips (
   output              dcen
 );
 
+  logic        is_branch_d;
+  logic        last_taken, predict_miss;
   logic [31:0] predict_pc;
-  logic        predict_miss;
 
   logic [1:0]  branch_d;
   logic        pc_src_d;
@@ -51,25 +52,30 @@ module mips (
 
   assign dcen = memwrite | mem_to_reg_m;
 
+  assign is_branch_d = |branch_d;
+  assign predict_miss = is_branch_d && pc_src_d != last_taken;
+
   bpb          u_bpb (
     .clk_i(clk),
     .rst_i(reset),
     .en_i(~stall_f),
     .pc_f_i(pc),
     .instr_f_i(instr),
-    .real_taken_i(pc_src_d),
-    .pc_d_i(pc_branch_d),
-    .instr_d_i(instr_d),
-    .predict_pc_o(predict_pc),
-    .miss_o(predict_miss)
+    .is_branch_d_i(is_branch_d),
+    .miss_i(predict_miss),
+    .pc_branch_i(pc_branch_d),
+    .last_taken_o(last_taken),
+    .predict_pc_o(predict_pc)
   );
 
   fetch        u_fetch (
     .clk_i(clk),
     .rst_i(reset),
     .instr_f_i(instr),
-    .pc_branch_d_i(predict_pc),
-    .pc_src_d_i(~predict_miss),
+    .predict_pc_i(predict_pc),
+    .predict_miss_i(predict_miss),
+    .pc_branch_d_i(pc_branch_d),
+    .pc_src_d_i(pc_src_d),
     .src_a_d_i(src_a_d),
     .jump_d_i(jump_d),
     .stall_f_i(stall_f),
@@ -170,6 +176,7 @@ module mips (
   );
 
   hazard_unit  u_hazard_unit (
+    .predict_miss_i(predict_miss),
     .rs_d_i(rs_d),
     .rt_d_i(rt_d),
     .branch_d_i(branch_d),
