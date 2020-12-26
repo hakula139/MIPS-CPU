@@ -9,11 +9,18 @@ module mips (
   input               reset,
   input        [31:0] instr,
   input        [31:0] readdata,
+  input               ihit,
+  input               dhit,
   output logic [31:0] pc,
   output logic        memwrite,
   output logic [31:0] aluout,
-  output logic [31:0] writedata
+  output logic [31:0] writedata,
+  output              dcen
 );
+
+  logic        is_branch_d;
+  logic        last_taken, predict_miss;
+  logic [31:0] predict_pc;
 
   logic [1:0]  branch_d;
   logic        pc_src_d;
@@ -43,10 +50,30 @@ module mips (
   logic        forward_a_d, forward_b_d;
   logic [1:0]  forward_a_e, forward_b_e;
 
+  assign dcen = memwrite | mem_to_reg_m;
+
+  assign is_branch_d = |branch_d;
+  assign predict_miss = is_branch_d && pc_src_d != last_taken;
+
+  bpb          u_bpb (
+    .clk_i(clk),
+    .rst_i(reset),
+    .en_i(~stall_f),
+    .pc_f_i(pc),
+    .instr_f_i(instr),
+    .is_branch_d_i(is_branch_d),
+    .miss_i(predict_miss),
+    .pc_branch_i(pc_branch_d),
+    .last_taken_o(last_taken),
+    .predict_pc_o(predict_pc)
+  );
+
   fetch        u_fetch (
     .clk_i(clk),
     .rst_i(reset),
     .instr_f_i(instr),
+    .predict_pc_i(predict_pc),
+    .predict_miss_i(predict_miss),
     .pc_branch_d_i(pc_branch_d),
     .pc_src_d_i(pc_src_d),
     .src_a_d_i(src_a_d),
@@ -149,6 +176,7 @@ module mips (
   );
 
   hazard_unit  u_hazard_unit (
+    .predict_miss_i(predict_miss),
     .rs_d_i(rs_d),
     .rt_d_i(rt_d),
     .branch_d_i(branch_d),

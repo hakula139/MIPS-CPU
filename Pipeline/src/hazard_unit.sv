@@ -2,6 +2,7 @@
 
 // Hazard handler
 module hazard_unit (
+  input              predict_miss_i,
   input        [4:0] rs_d_i,
   input        [4:0] rt_d_i,
   input        [1:0] branch_d_i,
@@ -27,7 +28,7 @@ module hazard_unit (
   output logic [1:0] forward_b_e_o
 );
 
-  logic lw_stall, branch_stall;
+  logic lw_stall, branch_stall, branch_predict_stall;
 
   // Solves data hazards with forwarding
   always_comb begin
@@ -60,8 +61,8 @@ module hazard_unit (
       || mem_to_reg_m_i && (rs_d_i == write_reg_m_i || rt_d_i == write_reg_m_i));
 
   assign stall_d_o = lw_stall || branch_stall;
-  assign flush_e_o = stall_d_o;
-  assign flush_d_o = pc_src_d_i || jump_d_i;
+  assign flush_e_o = stall_d_o || predict_miss_i;
+  assign flush_d_o = predict_miss_i || jump_d_i[1];  // wrong prediction or JR
   assign stall_f_o = stall_d_o;
 
 endmodule : hazard_unit
